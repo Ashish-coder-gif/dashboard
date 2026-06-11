@@ -327,6 +327,23 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
 }
 .card-shake{animation:card-shake .5s ease-out}
 
+/* CARD 6 Rocket Journey — fixed overlay rocket that flies across the page */
+.rocket-journey-layer{position:fixed;inset:0;pointer-events:none;z-index:5000}
+.rocket-journey-layer svg{position:absolute;left:0;top:0;overflow:visible;will-change:transform}
+.rocket-bubble{position:absolute;max-width:min(230px,72vw);background:#fff;border:3px solid #F2E3CC;
+  border-radius:18px;padding:10px 14px;font-family:'Fredoka One',sans-serif;font-size:.95rem;
+  line-height:1.4;color:var(--ink);box-shadow:0 8px 20px rgba(59,43,43,.18);
+  opacity:0;transform:translateY(10px) scale(.92);
+  transition:opacity .3s ease,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.rocket-bubble.rb-show{opacity:1;transform:translateY(0) scale(1)}
+
+/* Global sound toggle — fixed in the nav strip, no layout shift */
+.sound-toggle{position:fixed;top:10px;right:12px;z-index:120;width:40px;height:40px;
+  border-radius:50%;border:2px solid #F2E3CC;background:#FFF0DC;cursor:pointer;
+  font-size:1.1rem;line-height:1;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 10px rgba(59,43,43,.14);padding:0}
+.sound-toggle:active{transform:scale(.9)}
+
 /* Scroll pressure gauge — fixed right edge */
 .scroll-gauge{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:90;
   display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 7px;
@@ -1645,11 +1662,9 @@ let heartAnimI = null;
 let card5Used  = false;
 let lastHeartbeatTime = 0;
 
-function triggerHeartbeat(){
-  card5Used = true;
-  showInsight('ins5');
-  updateBP();
-
+// one heartbeat: sound + heart pulse + artery wave (no insight side effects,
+// so the automatic loop can reuse it)
+function bpHeartbeatOnce(){
   const stress = +document.getElementById('stress-slider').value;
   if (window.soundFX) window.soundFX.playHeartbeatSound(stress);
 
@@ -1675,6 +1690,15 @@ function triggerHeartbeat(){
   }, 400);
 }
 
+function triggerHeartbeat(){
+  card5Used = true;
+  showInsight('ins5');
+  updateBP();
+  bpHeartbeatOnce();
+  // a manual beat re-syncs the automatic rhythm so beats never pile up
+  if (heartbeatLoopActive) scheduleNextHeartbeat();
+}
+
 function updateBP(){
   const stress = +document.getElementById('stress-slider').value;
   const sys = Math.round(120 + stress * 0.6);
@@ -1695,11 +1719,14 @@ function updateBP(){
 }
 
 document.getElementById('heart-group').addEventListener('click', triggerHeartbeat);
-document.getElementById('stress-slider').addEventListener('input', ()=>{
+document.getElementById('stress-slider').addEventListener('input', (e)=>{
   card5Used = true;
   showInsight('ins5');
   updateBP();
-  
+
+  // subtle rising/falling tone tracks the BP change
+  if (window.soundFX) window.soundFX.playSliderSound(+e.target.value, 0, 100);
+
   const now = performance.now();
   if (now - lastHeartbeatTime > 400) {
     lastHeartbeatTime = now;
@@ -1707,12 +1734,54 @@ document.getElementById('stress-slider').addEventListener('input', ()=>{
   }
 });
 
+/* Continuous heartbeat while the Blood Pressure card is on screen.
+   Rate/volume follow the stress slider (read live each cycle); the sound
+   itself respects the global mute via playHeartbeatSound. */
+let heartbeatLoopActive = false;
+let heartbeatTimer = null;
+
+function scheduleNextHeartbeat(){
+  clearTimeout(heartbeatTimer);
+  const stress = +document.getElementById('stress-slider').value;
+  const bpm = 70 + stress * 0.8;   // same mapping as the ECG trace
+  heartbeatTimer = setTimeout(()=>{
+    if (!heartbeatLoopActive) return;
+    if (!document.hidden) bpHeartbeatOnce();   // no beeping from background tabs
+    scheduleNextHeartbeat();
+  }, 60000 / bpm);
+}
+
+function startBloodPressureHeartbeatLoop(){
+  if (heartbeatLoopActive) return;
+  heartbeatLoopActive = true;
+  bpHeartbeatOnce();
+  scheduleNextHeartbeat();
+}
+
+function stopBloodPressureHeartbeatLoop(){
+  heartbeatLoopActive = false;
+  clearTimeout(heartbeatTimer);
+  heartbeatTimer = null;
+}
+
+new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting) startBloodPressureHeartbeatLoop();
+    else stopBloodPressureHeartbeatLoop();
+  });
+}, { threshold: 0.35 }).observe(document.getElementById('card5'));
+
 
 /* ══════════════════════════════════
    CARD 6 · ROCKET LAUNCH
 ══════════════════════════════════ */
 let rocketLaunched = false;
 let rocketRAF = null;
+let journeyActive = false;
+let journeyRAF = null;
+let journeyEls = null;
+let journeyPad = null;
+let journeyBubbleTimer = null;
 
 function igniteRocket(){
   if(rocketLaunched) return;
@@ -1732,46 +1801,260 @@ function igniteRocket(){
   const tDisp     = document.getElementById('c6-thrust');
   const badge     = document.getElementById('liftoff-badge');
 
-  card6.classList.add('card-shake');
-  card6.addEventListener('animationend', ()=>card6.classList.remove('card-shake'), {once:true});
+  // remember the exact pad spot (viewport rect + scroll) so the journey can land home
+  journeyPad = { rect: rocketGrp.getBoundingClientRect(), scrollY: window.scrollY };
 
-  flames.setAttribute('opacity','1');
+  /* PHASE 1 — pre-launch countdown: vibration, engine glow, tiny smoke */
+  flames.setAttribute('opacity','0.25');
   flames.classList.add('flame-active');
-  arms.setAttribute('opacity','0');
+  let preFrame = 0;
+  function prelaunch(){
+    if(!rocketLaunched) return;   // reset pressed during countdown
+    preFrame++;
+    const jx=(Math.random()-.5)*2.6, jy=(Math.random()-.5)*1.4;
+    rocketGrp.setAttribute('transform', `translate(${(280+jx).toFixed(2)},${(215+jy).toFixed(2)})`);
+    // countdown beeps: 3..2..1
+    if((preFrame===1 || preFrame===29 || preFrame===57) && window.soundFX)
+      window.soundFX.tone({ frequency: 760, duration: 0.1, type: 'sine', gain: 0.05 });
+    if(preFrame%10===0) spawnSmoke(280, 282, 0.1);
+    if(preFrame < 85){ rocketRAF = requestAnimationFrame(prelaunch); }
+    else { rocketGrp.setAttribute('transform','translate(280,215)'); liftoff(); }
+  }
+  rocketRAF = requestAnimationFrame(prelaunch);
 
-  const ROCKET_Y0 = 215, FLAME_Y0 = 270, LIFT = 205, MAX_T = 35000, DUR = 240;
-  let frame = 0;
+  /* PHASE 2 — liftoff inside the sim box, hand off to the page-wide journey */
+  function liftoff(){
+    card6.classList.add('card-shake');
+    card6.addEventListener('animationend', ()=>card6.classList.remove('card-shake'), {once:true});
 
-  function launch(){
-    frame++;
-    const raw   = Math.min(1, frame/DUR);
-    const eased = raw < 0.5 ? 2*raw*raw : -1+(4-2*raw)*raw;
+    flames.setAttribute('opacity','1');
+    arms.setAttribute('opacity','0');
 
-    rocketGrp.setAttribute('transform', `translate(280,${ROCKET_Y0 - eased*LIFT})`);
-    flames.setAttribute('transform',    `translate(280,${FLAME_Y0  - eased*LIFT})`);
+    const ROCKET_Y0 = 215, FLAME_Y0 = 270, LIFT = 205, MAX_T = 35000, DUR = 240;
+    let frame = 0;
 
-    const gaugeH = Math.round(eased*148);
-    tFill.setAttribute('height', gaugeH);
-    tFill.setAttribute('y',      171 - gaugeH);
-    const r=Math.round(88 +eased*(255-88)), g=Math.round(179+eased*(90-179)), b=Math.round(104+eased*(60-104));
-    const col=`rgb(${r},${g},${b})`;
-    tFill.setAttribute('fill', col);
-    tPct.textContent = Math.round(eased*100)+'%';
-    tPct.setAttribute('fill', col);
-    tDisp.textContent = Math.round(eased*MAX_T).toLocaleString();
+    function launch(){
+      frame++;
+      const raw   = Math.min(1, frame/DUR);
+      const eased = raw < 0.5 ? 2*raw*raw : -1+(4-2*raw)*raw;
 
-    if (window.soundFX) window.soundFX.updateRocketSound(eased);
+      rocketGrp.setAttribute('transform', `translate(280,${ROCKET_Y0 - eased*LIFT})`);
+      flames.setAttribute('transform',    `translate(280,${FLAME_Y0  - eased*LIFT})`);
 
-    if(frame%3===0) spawnSmoke(280, FLAME_Y0 - eased*LIFT + 12, eased);
-    if(raw>=0.75) badge.setAttribute('opacity', Math.min(1,(raw-0.75)/0.25).toFixed(2));
-    
-    if (raw < 1) {
-      rocketRAF = requestAnimationFrame(launch);
-    } else {
-      if (window.soundFX) window.soundFX.stopRocketSound();
+      const gaugeH = Math.round(eased*148);
+      tFill.setAttribute('height', gaugeH);
+      tFill.setAttribute('y',      171 - gaugeH);
+      const r=Math.round(88 +eased*(255-88)), g=Math.round(179+eased*(90-179)), b=Math.round(104+eased*(60-104));
+      const col=`rgb(${r},${g},${b})`;
+      tFill.setAttribute('fill', col);
+      tPct.textContent = Math.round(eased*100)+'%';
+      tPct.setAttribute('fill', col);
+      tDisp.textContent = Math.round(eased*MAX_T).toLocaleString();
+
+      if (window.soundFX) window.soundFX.updateRocketSound(eased);
+
+      if(!journeyActive && raw>=0.45) startRocketJourney(rocketGrp, flames);
+      if(!journeyActive && frame%3===0) spawnSmoke(280, FLAME_Y0 - eased*LIFT + 12, eased);
+      if(raw>=0.75) badge.setAttribute('opacity', Math.min(1,(raw-0.75)/0.25).toFixed(2));
+
+      if (raw < 1) {
+        rocketRAF = requestAnimationFrame(launch);
+      } else {
+        // keep the engine rumbling while the overlay journey is in flight
+        if (!journeyActive && window.soundFX) window.soundFX.stopRocketSound();
+      }
+    }
+    rocketRAF = requestAnimationFrame(launch);
+  }
+}
+
+/* PHASES 3–6 — overlay rocket leaves the box, teaches pressure on the way
+   to the hero section, says goodbye, flies back and lands on the pad */
+const JOURNEY_BUBBLES = [
+  '🚀 Fuel burns inside the rocket engine!',
+  '🔥 Burning fuel creates very hot gases!',
+  '💨 The hot gases get squeezed and create HIGH pressure!',
+  '⬇️ High-pressure gases rush downward through the nozzle!',
+  '⚡ When gases push DOWN, the rocket gets pushed UP!',
+  "🚀 That's pressure in action!"
+];
+
+function startRocketJourney(rocketGrp, flames){
+  journeyActive = true;
+  const NS = 'http://www.w3.org/2000/svg';
+  const rectNow = rocketGrp.getBoundingClientRect();
+  const scale = rectNow.height/129;          // rocket art is 129 svg units tall
+
+  // clone rocket + flames before hiding the originals
+  const rk = rocketGrp.cloneNode(true); rk.removeAttribute('id');
+  rk.setAttribute('transform','translate(0,0)');
+  const fl = flames.cloneNode(true); fl.removeAttribute('id');
+  fl.setAttribute('transform','translate(0,55)');
+  fl.setAttribute('opacity','1');
+  fl.classList.add('flame-active');
+  rocketGrp.setAttribute('opacity','0');
+  flames.setAttribute('opacity','0');
+
+  const layer = document.createElement('div');
+  layer.className = 'rocket-journey-layer';
+  const svg = document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox','-45 -75 90 175');
+  svg.setAttribute('width', (90*scale).toFixed(1));
+  svg.setAttribute('height',(175*scale).toFixed(1));
+  const smokeG = document.createElementNS(NS,'g');
+  const glow = document.createElementNS(NS,'ellipse');
+  glow.setAttribute('cx','0'); glow.setAttribute('cy','92');
+  glow.setAttribute('rx','9'); glow.setAttribute('ry','24');
+  glow.setAttribute('fill','#FF9F2E'); glow.setAttribute('opacity','0.3');
+  svg.appendChild(smokeG); svg.appendChild(glow); svg.appendChild(fl); svg.appendChild(rk);
+  const bubble = document.createElement('div');
+  bubble.className = 'rocket-bubble';
+  layer.appendChild(svg); layer.appendChild(bubble);
+  document.body.appendChild(layer);
+  journeyEls = { layer, svg, bubble, fl, glow, smokeG };
+
+  // anchor = rocket origin point (between nose and nozzle) in viewport px
+  const ax0 = rectNow.left + rectNow.width/2;
+  const ay0 = rectNow.top  + (70/129)*rectNow.height;
+  const padR  = journeyPad.rect;
+  const padAx = padR.left + padR.width/2;
+  const padAy = padR.top  + (70/129)*padR.height;
+  const homeScroll = journeyPad.scrollY;
+  const hoverY = Math.max(160, Math.min(250, window.innerHeight*0.36));
+
+  let bubbleText = null;
+  function setBubble(text){
+    if(bubbleText === text) return;
+    bubbleText = text;
+    bubble.classList.remove('rb-show');
+    clearTimeout(journeyBubbleTimer);
+    if(text){
+      journeyBubbleTimer = setTimeout(()=>{
+        bubble.textContent = text;
+        bubble.classList.add('rb-show');
+        if(window.soundFX) window.soundFX.playBubbleSound();
+      }, 280);
     }
   }
-  rocketRAF = requestAnimationFrame(launch);
+
+  let bubX = ax0, bubY = ay0;
+  function placeRocket(x, y, rot){
+    svg.style.transform =
+      `translate3d(${(x-45*scale).toFixed(1)}px,${(y-75*scale).toFixed(1)}px,0) rotate(${rot.toFixed(1)}deg)`;
+    // speech bubble loosely follows the rocket
+    const bw = bubble.offsetWidth || 200;
+    let tx = x + 48*scale + 12, ty = y - 56;
+    if(tx + bw > window.innerWidth - 8) tx = x - 48*scale - bw - 12;
+    if(tx < 8) tx = 8;
+    if(ty < 70) ty = 70;
+    bubX += (tx-bubX)*0.14; bubY += (ty-bubY)*0.14;
+    bubble.style.left = bubX.toFixed(1)+'px';
+    bubble.style.top  = bubY.toFixed(1)+'px';
+  }
+
+  function puff(strength){
+    const c = document.createElementNS(NS,'circle');
+    let cx=(Math.random()-.5)*16, cy=86, r=3+Math.random()*4, op=.4;
+    const grey=Math.round(120+Math.random()*90);
+    c.setAttribute('fill',`rgb(${grey},${grey},${grey})`);
+    smokeG.appendChild(c);
+    const vx=(Math.random()-.5)*1.2, vy=2+Math.random()*2.2*strength;
+    (function drift(){
+      cx+=vx; cy+=vy; op-=0.022; r+=0.35;
+      c.setAttribute('cx',cx.toFixed(1)); c.setAttribute('cy',cy.toFixed(1));
+      c.setAttribute('r',r.toFixed(1)); c.setAttribute('opacity',Math.max(0,op).toFixed(3));
+      if(op>0 && journeyActive) requestAnimationFrame(drift); else c.remove();
+    })();
+  }
+
+  const easeIO = t => t<0.5 ? 2*t*t : -1+(4-2*t)*t;
+  const T_UP=10000, T_HOVER=1300, T_BYE=2400, T_FLIP=800, T_DOWN=7000, T_LAND=650;
+  let phase='up', phaseStart=performance.now(), tick=0, descentFromScroll=0;
+
+  function step(now){
+    if(!journeyActive) return;
+    tick++;
+    const el = now - phaseStart;
+
+    if(phase==='up'){
+      const p = Math.min(1, el/T_UP), e = easeIO(p);
+      window.scrollTo(0, homeScroll*(1-e));
+      const x = ax0 + Math.sin(now/300)*14*Math.sin(Math.PI*Math.min(1,p*1.2));
+      const y = ay0 + (hoverY-ay0)*e;
+      placeRocket(x, y, Math.sin(now/300)*4);
+      glow.setAttribute('opacity',(0.25+0.15*Math.sin(now/90)).toFixed(2));
+      if(tick%3===0) puff(1);
+      const seg = Math.min(5, Math.floor(p*6)), f = p*6-seg;
+      setBubble(f>0.06 && f<0.92 ? JOURNEY_BUBBLES[seg] : null);
+      if(p>=1){
+        phase='hover'; phaseStart=now; setBubble(null); window.scrollTo(0,0);
+        // cheerful arrival ding + engine settles to a quiet idle
+        if(window.soundFX){ window.soundFX.playDingSound(); window.soundFX.updateRocketSound(0.1); }
+      }
+    }
+    else if(phase==='hover' || phase==='bye'){
+      const y = hoverY + Math.sin(now/260)*6;
+      placeRocket(ax0 + Math.sin(now/420)*5, y, Math.sin(now/420)*2);
+      if(tick%5===0) puff(0.4);
+      if(phase==='hover' && el>=T_HOVER){
+        phase='bye'; phaseStart=now;
+        setBubble('💬 Bye! Keep exploring pressure! 🚀');
+        if(window.soundFX) window.soundFX.playCorrectSound();
+      } else if(phase==='bye' && el>=T_BYE){
+        phase='flip'; phaseStart=now; setBubble(null);
+      }
+    }
+    else if(phase==='flip'){
+      const p = Math.min(1, el/T_FLIP);
+      placeRocket(ax0, hoverY, easeIO(p)*360);
+      if(p>=1){ phase='down'; phaseStart=now; descentFromScroll=window.scrollY; }
+    }
+    else if(phase==='down'){
+      const p = Math.min(1, el/T_DOWN), e = easeIO(p);
+      window.scrollTo(0, descentFromScroll + (homeScroll-descentFromScroll)*e);
+      const x = ax0 + (padAx-ax0)*e + Math.sin(now/320)*10*(1-e);
+      const y = hoverY + (padAy-hoverY)*e;
+      placeRocket(x, y, Math.sin(now/320)*3*(1-e));
+      fl.setAttribute('opacity', (0.5+0.5*(1-e)).toFixed(2));
+      // lighter engine sound on the way down, fading toward landing
+      if(window.soundFX) window.soundFX.updateRocketSound(0.05 + 0.3*(1-e));
+      if(tick%4===0) puff(0.7);
+      if(p>=1){ phase='land'; phaseStart=now; window.scrollTo(0, homeScroll); }
+    }
+    else if(phase==='land'){
+      const p = Math.min(1, el/T_LAND);
+      const hop = Math.sin(Math.PI*p)*5;     // tiny bounce
+      placeRocket(padAx, padAy - hop, 0);
+      fl.setAttribute('opacity', Math.max(0, 0.5-p*0.6).toFixed(2));
+      glow.setAttribute('opacity', Math.max(0, 0.25*(1-p)).toFixed(2));
+      if(p>=1){ finishRocketJourney(); return; }
+    }
+    journeyRAF = requestAnimationFrame(step);
+  }
+  journeyRAF = requestAnimationFrame(step);
+}
+
+function finishRocketJourney(){
+  endRocketJourney();
+  resetRocket();   // restore pad, gauge and buttons — launch is ready again
+  // landing dust puffs + gentle settle motion
+  for(let i=0;i<7;i++) spawnSmoke(258+Math.random()*44, 276, 0.15);
+  const grp = document.getElementById('rocket-group');
+  let f = 0;
+  (function settle(){
+    f++;
+    const dy = Math.sin(f/14*Math.PI)*2;
+    grp.setAttribute('transform',`translate(280,${(215+dy).toFixed(2)})`);
+    if(f<14 && !rocketLaunched) requestAnimationFrame(settle);
+    else if(!rocketLaunched) grp.setAttribute('transform','translate(280,215)');
+  })();
+}
+
+function endRocketJourney(){
+  journeyActive = false;
+  cancelAnimationFrame(journeyRAF);
+  clearTimeout(journeyBubbleTimer);
+  if(journeyEls){ journeyEls.layer.remove(); journeyEls = null; }
 }
 
 function spawnSmoke(cx, cy, intensity){
@@ -1799,9 +2082,10 @@ function spawnSmoke(cx, cy, intensity){
 function resetRocket(){
   rocketLaunched=false;
   cancelAnimationFrame(rocketRAF);
+  endRocketJourney();
   if (window.soundFX) {
     window.soundFX.stopRocketSound();
-    window.soundFX.tone({ frequency: 200, slideTo: 40, duration: 0.3, type: 'sine', gain: 0.035 });
+    window.soundFX.tone({ frequency: 200, slideTo: 40, duration: 0.3, type: 'sine', gain: 0.055 });
   }
   document.getElementById('btn-ignite').style.display='';
   document.getElementById('btn-rocket-reset').style.display='none';
@@ -1809,7 +2093,9 @@ function resetRocket(){
   flames.setAttribute('opacity','0');
   flames.classList.remove('flame-active');
   flames.setAttribute('transform','translate(280,270)');
-  document.getElementById('rocket-group').setAttribute('transform','translate(280,215)');
+  const rocketGrp=document.getElementById('rocket-group');
+  rocketGrp.setAttribute('transform','translate(280,215)');
+  rocketGrp.setAttribute('opacity','1');
   document.getElementById('launch-arms').setAttribute('opacity','1');
   const tFill=document.getElementById('thrust-gauge-fill');
   tFill.setAttribute('height','0'); tFill.setAttribute('y','171'); tFill.setAttribute('fill','#58B368');
@@ -2096,6 +2382,11 @@ function resetRocket(){
 ══════════════════════════════════ */
 (function(){
   let audioCtx = null;
+  let masterGain = null;
+  const MUTE_KEY = 'pv-sound-muted';
+  let muted = false;
+  try { muted = localStorage.getItem(MUTE_KEY) === '1'; } catch(e) {}
+  let soundToggleBtn = null;
   let lastSliderSound = 0;
   let forceOsc = null;
   let forceGain = null;
@@ -2231,7 +2522,32 @@ function resetRocket(){
     }
   }
 
+  // master bus — every sound routes through this so mute controls everything
+  function masterBus(ctx) {
+    if (!masterGain) {
+      masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(muted ? 0.0001 : 1, ctx.currentTime);
+      masterGain.connect(ctx.destination);
+    }
+    return masterGain;
+  }
+
+  function setMuted(m) {
+    muted = m;
+    try { localStorage.setItem(MUTE_KEY, m ? '1' : '0'); } catch(e) {}
+    if (audioCtx && masterGain) {
+      masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      masterGain.gain.setValueAtTime(Math.max(0.0001, masterGain.gain.value), audioCtx.currentTime);
+      masterGain.gain.exponentialRampToValueAtTime(m ? 0.0001 : 1, audioCtx.currentTime + 0.15);
+    }
+    if (soundToggleBtn) {
+      soundToggleBtn.textContent = m ? '🔇' : '🔊';
+      soundToggleBtn.setAttribute('aria-label', m ? 'Sound off — tap to unmute' : 'Sound on — tap to mute');
+    }
+  }
+
   function tone({ frequency = 440, duration = 0.07, type = 'sine', gain = 0.03, slideTo = null } = {}) {
+    if (muted) return;
     const ctx = getAudioContext();
     if (!ctx) return;
     const osc = ctx.createOscillator();
@@ -2245,13 +2561,13 @@ function resetRocket(){
     amp.gain.exponentialRampToValueAtTime(gain, ctx.currentTime + 0.01);
     amp.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
     osc.connect(amp);
-    amp.connect(ctx.destination);
+    amp.connect(masterBus(ctx));
     osc.start();
     osc.stop(ctx.currentTime + duration + 0.03);
   }
 
   function playButtonSound() {
-    tone({ frequency: 520, slideTo: 390, duration: 0.08, type: 'triangle', gain: 0.026 });
+    tone({ frequency: 520, slideTo: 390, duration: 0.08, type: 'triangle', gain: 0.05 });
   }
 
   function playSliderSound(value, min, max) {
@@ -2260,19 +2576,20 @@ function resetRocket(){
     lastSliderSound = now;
     const ratio = (value - min) / Math.max(1, (max - min));
     const frequency = 240 + ratio * 420;
-    tone({ frequency, slideTo: frequency * 1.1, duration: 0.05, type: 'sine', gain: 0.018 });
+    tone({ frequency, slideTo: frequency * 1.1, duration: 0.05, type: 'sine', gain: 0.035 });
   }
 
   function playCorrectSound() {
-    tone({ frequency: 660, slideTo: 880, duration: 0.08, type: 'triangle', gain: 0.03 });
-    setTimeout(() => tone({ frequency: 990, slideTo: 1320, duration: 0.06, type: 'triangle', gain: 0.02 }), 70);
+    tone({ frequency: 660, slideTo: 880, duration: 0.08, type: 'triangle', gain: 0.055 });
+    setTimeout(() => tone({ frequency: 990, slideTo: 1320, duration: 0.06, type: 'triangle', gain: 0.04 }), 70);
   }
 
   function playWrongSound() {
-    tone({ frequency: 220, slideTo: 150, duration: 0.12, type: 'sawtooth', gain: 0.018 });
+    tone({ frequency: 220, slideTo: 150, duration: 0.12, type: 'sawtooth', gain: 0.035 });
   }
 
   function playNoise({ duration = 0.15, gain = 0.05, filterStart = 2000, filterEnd = 100 } = {}) {
+    if (muted) return;
     const ctx = getAudioContext();
     if (!ctx) return;
     const bufferSize = ctx.sampleRate * duration;
@@ -2296,7 +2613,7 @@ function resetRocket(){
 
     noise.connect(filter);
     filter.connect(amp);
-    amp.connect(ctx.destination);
+    amp.connect(masterBus(ctx));
     noise.start();
     noise.stop(ctx.currentTime + duration + 0.03);
   }
@@ -2311,6 +2628,7 @@ function resetRocket(){
   }
 
   function startForceSound() {
+    if (muted) return;
     const ctx = getAudioContext();
     if (!ctx) return;
     if (forceOsc) return;
@@ -2329,8 +2647,8 @@ function resetRocket(){
 
     forceOsc.connect(filter);
     filter.connect(forceGain);
-    forceGain.connect(ctx.destination);
-    
+    forceGain.connect(masterBus(ctx));
+
     forceOsc.start();
   }
 
@@ -2338,10 +2656,10 @@ function resetRocket(){
     if (!forceOsc || !forceGain) return;
     const ctx = getAudioContext();
     if (!ctx) return;
-    
+
     const pitch = 100 + (f / 100) * 100;
-    const volume = (f / 100) * 0.035;
-    
+    const volume = (f / 100) * 0.055;
+
     forceOsc.frequency.setTargetAtTime(pitch, ctx.currentTime, 0.05);
     forceGain.gain.setTargetAtTime(volume, ctx.currentTime, 0.05);
   }
@@ -2371,9 +2689,10 @@ function resetRocket(){
   }
 
   function playHydraulicSound() {
+    if (muted) return;
     const ctx = getAudioContext();
     if (!ctx) return;
-    
+
     if (hydraulicTimeout) {
       clearTimeout(hydraulicTimeout);
       hydraulicTimeout = null;
@@ -2391,11 +2710,11 @@ function resetRocket(){
       hydraulicOsc2.frequency.setValueAtTime(170, ctx.currentTime);
 
       hydraulicGain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      hydraulicGain.gain.linearRampToValueAtTime(0.018, ctx.currentTime + 0.05);
+      hydraulicGain.gain.linearRampToValueAtTime(0.034, ctx.currentTime + 0.05);
 
       hydraulicOsc1.connect(hydraulicGain);
       hydraulicOsc2.connect(hydraulicGain);
-      hydraulicGain.connect(ctx.destination);
+      hydraulicGain.connect(masterBus(ctx));
 
       hydraulicOsc1.start();
       hydraulicOsc2.start();
@@ -2443,7 +2762,7 @@ function resetRocket(){
       slideTo: startF * 1.6,
       duration: 0.06,
       type: 'sine',
-      gain: 0.012
+      gain: 0.03
     });
   }
 
@@ -2460,21 +2779,22 @@ function resetRocket(){
       slideTo: 1200,
       duration: 1.2,
       type: 'sine',
-      gain: 0.025
+      gain: 0.04
     });
-    
+
     setTimeout(() => {
       tone({
         frequency: 1200,
         slideTo: 1200,
         duration: 0.8,
         type: 'sine',
-        gain: 0.007
+        gain: 0.012
       });
     }, 350);
   }
 
   function playHissSound() {
+    if (muted) return;
     const ctx = getAudioContext();
     if (!ctx) return;
     if (hissSource) return;
@@ -2497,11 +2817,11 @@ function resetRocket(){
 
     hissGain = ctx.createGain();
     hissGain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    hissGain.gain.linearRampToValueAtTime(0.015, ctx.currentTime + 0.05);
+    hissGain.gain.linearRampToValueAtTime(0.028, ctx.currentTime + 0.05);
 
     hissSource.connect(hissFilter);
     hissFilter.connect(hissGain);
-    hissGain.connect(ctx.destination);
+    hissGain.connect(masterBus(ctx));
 
     hissSource.start();
   }
@@ -2512,7 +2832,7 @@ function resetRocket(){
     if (!ctx) return;
 
     const freq = 600 + (compressionRatio - 1) * 500;
-    const vol = 0.012 + (compressionRatio - 1) * 0.008;
+    const vol = 0.024 + (compressionRatio - 1) * 0.014;
 
     hissFilter.frequency.setTargetAtTime(freq, ctx.currentTime, 0.05);
     hissGain.gain.setTargetAtTime(vol, ctx.currentTime, 0.05);
@@ -2543,30 +2863,55 @@ function resetRocket(){
     }, 100);
   }
 
+  // one audible heart thump: low boom that stays in the 90-220 Hz speaker range
+  // plus a mid-frequency knock layer; linear envelopes keep the body audible
+  // (the generic tone() envelope decays exponentially and vanishes in ~30ms)
+  function heartThump(ctx, when, freq, peak) {
+    const osc = ctx.createOscillator();
+    const amp = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, when);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.6, when + 0.18);
+    amp.gain.setValueAtTime(0.0001, when);
+    amp.gain.linearRampToValueAtTime(peak, when + 0.015);
+    amp.gain.linearRampToValueAtTime(peak * 0.4, when + 0.1);
+    amp.gain.linearRampToValueAtTime(0.0001, when + 0.22);
+    osc.connect(amp);
+    amp.connect(masterBus(ctx));
+    osc.start(when);
+    osc.stop(when + 0.25);
+
+    const knock = ctx.createOscillator();
+    const knockAmp = ctx.createGain();
+    knock.type = 'triangle';
+    knock.frequency.setValueAtTime(freq * 3, when);
+    knock.frequency.exponentialRampToValueAtTime(freq * 1.4, when + 0.07);
+    knockAmp.gain.setValueAtTime(0.0001, when);
+    knockAmp.gain.linearRampToValueAtTime(peak * 0.55, when + 0.008);
+    knockAmp.gain.linearRampToValueAtTime(0.0001, when + 0.09);
+    knock.connect(knockAmp);
+    knockAmp.connect(masterBus(ctx));
+    knock.start(when);
+    knock.stop(when + 0.12);
+  }
+
   function playHeartbeatSound(stress) {
+    if (muted) return;
     const ctx = getAudioContext();
     if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
 
-    const vol = 0.05 + (stress / 100) * 0.05;
+    const s = Math.max(0, Math.min(100, +stress || 0)) / 100;
+    const peak = 0.22 + s * 0.13;          // clearly audible, stronger at high BP
+    const gap = 0.17 - s * 0.06;           // faster lub-dub when stressed
+    const t0 = ctx.currentTime + 0.02;
 
-    tone({
-      frequency: 58,
-      duration: 0.08,
-      type: 'sine',
-      gain: vol
-    });
-
-    setTimeout(() => {
-      tone({
-        frequency: 48,
-        duration: 0.1,
-        type: 'sine',
-        gain: vol * 0.8
-      });
-    }, 140);
+    heartThump(ctx, t0, 150 + s * 40, peak);              // LUB
+    heartThump(ctx, t0 + gap, 125 + s * 30, peak * 0.8);  // dub
   }
 
   function playRocketSound() {
+    if (muted) return;
     const ctx = getAudioContext();
     if (!ctx) return;
     if (rocketOsc) return;
@@ -2596,7 +2941,7 @@ function resetRocket(){
     rocketOsc.connect(rocketFilter);
     rocketNoise.connect(rocketFilter);
     rocketFilter.connect(rocketGain);
-    rocketGain.connect(ctx.destination);
+    rocketGain.connect(masterBus(ctx));
 
     rocketOsc.start();
     rocketNoise.start();
@@ -2643,10 +2988,30 @@ function resetRocket(){
     }, 700);
   }
 
+  function playPopSound() {
+    tone({ frequency: 700, slideTo: 1000, duration: 0.06, type: 'sine', gain: 0.04 });
+  }
+
+  function playDingSound() {
+    tone({ frequency: 1046, slideTo: 1568, duration: 0.2, type: 'triangle', gain: 0.055 });
+  }
+
+  function playQuizComplete() {
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, i) => {
+      setTimeout(() => tone({ frequency: freq, slideTo: freq * 1.02, duration: 0.16, type: 'triangle', gain: 0.05 }), i * 120);
+    });
+    setTimeout(() => tone({ frequency: 1318.5, duration: 0.3, type: 'triangle', gain: 0.045 }), 520);
+  }
+
   // Expose system globally for other modules in the page
   window.soundFX = {
     tone,
     playButtonSound,
+    playSliderSound,
+    playPopSound,
+    playDingSound,
+    playQuizComplete,
     playCorrectSound,
     playWrongSound,
     playNoise,
@@ -2663,17 +3028,32 @@ function resetRocket(){
     updateHissSound,
     stopHissSound,
     playHeartbeatSound,
+    testHeartbeat: function(stress) { playHeartbeatSound(stress === undefined ? 50 : stress); },
     playRocketSound,
     updateRocketSound,
     stopRocketSound,
     toggleMusic,
     startBackgroundMusic,
-    stopBackgroundMusic
+    stopBackgroundMusic,
+    setMuted,
+    isMuted: () => muted
   };
+
+  // Global mute/unmute toggle — fixed position, no layout shift
+  soundToggleBtn = document.createElement('button');
+  soundToggleBtn.className = 'sound-toggle';
+  soundToggleBtn.type = 'button';
+  document.body.appendChild(soundToggleBtn);
+  soundToggleBtn.addEventListener('click', () => {
+    setMuted(!muted);
+    if (!muted) playPopSound();
+  });
+  setMuted(muted);
 
   document.addEventListener('pointerdown', event => {
     const button = event.target.closest('button');
     if (button) playButtonSound();
+    else if (event.target.closest('a.nav-tab')) playPopSound();
   }, { passive: true, capture: true });
 
   document.addEventListener('pointerdown', unlockAudio, { passive: true, capture: true, once: true });
@@ -2822,6 +3202,7 @@ function resetRocket(){
       if (current >= QUIZ_DATA.length) {
         questionView.style.display = 'none';
         resultsEl.classList.add('qr-show');
+        playQuizComplete();
         progressFill.style.width = '100%';
         resultsScore.textContent = `${score} / ${QUIZ_DATA.length}`;
         resultsMsg.textContent = score >= 6 ? '🏆 Outstanding! You are a pressure expert!' : score >= 4 ? '🎉 Great job! A little more practice and you’ll nail it.' : score >= 2 ? '📖 Good try! Re-read the sections and try again.' : '💪 Keep going! Every attempt makes you smarter.';
