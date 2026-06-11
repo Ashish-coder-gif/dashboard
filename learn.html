@@ -1,0 +1,2703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PressureVerse – Learn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFF6E9;--tomato:#FF5A4E;--leaf:#58B368;--pressure:#A04EF6;
+  --force:#FF9F2E;--area:#3E8BFA;--ink:#3B2B2B;--radius:22px;
+  --nav-h:60px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font-family:'Nunito',sans-serif;
+  min-width:360px;padding-bottom:60px}
+
+/* NAV */
+.site-nav{position:sticky;top:0;z-index:100;background:rgba(255,246,233,.85);
+  backdrop-filter:blur(10px);border-bottom:2px solid #F2E3CC;height:var(--nav-h);
+  display:flex;align-items:center;justify-content:center}
+.nav-inner{position:relative;display:flex;gap:4px;background:#F2E3CC;
+  border-radius:999px;padding:5px}
+.nav-tab{position:relative;z-index:1;text-decoration:none;color:var(--ink);
+  font-family:'Fredoka One',sans-serif;font-size:1rem;padding:7px 22px;
+  border-radius:999px;transition:color .25s}
+.nav-tab.active{color:#fff}
+.nav-pill{position:absolute;top:5px;height:calc(100% - 10px);background:var(--tomato);
+  border-radius:999px;transition:left .3s cubic-bezier(.4,0,.2,1),width .3s cubic-bezier(.4,0,.2,1);
+  z-index:0}
+
+/* PAGE HEADER */
+.page-header{text-align:center;padding:40px 20px 20px}
+.page-header h1{font-family:'Fredoka One',sans-serif;font-size:2.4rem;color:var(--pressure);
+  line-height:1.1}
+.page-header p{font-size:1.05rem;color:#6b5a5a;margin-top:8px}
+
+/* CARDS */
+.cards{display:flex;flex-direction:column;gap:32px;max-width:700px;
+  margin:0 auto;padding:0 16px}
+.card{background:#fff;border-radius:var(--radius);border:3px solid #F2E3CC;
+  box-shadow:0 10px 24px rgba(59,43,43,.12);padding:24px;overflow:hidden}
+.card-title{font-family:'Fredoka One',sans-serif;font-size:1.35rem;color:var(--ink);
+  margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-title span.em{font-size:1.5rem}
+
+/* content flow helpers */
+.hero-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.section-nav{top:60px}
+.section-nav .nav-inner{max-width:calc(100vw - 16px);overflow-x:auto;scrollbar-width:none}
+.section-nav .nav-inner::-webkit-scrollbar{display:none}
+.section-nav .nav-tab{white-space:nowrap;font-size:.9rem;padding:7px 16px}
+.section-label{font-family:'Fredoka One',sans-serif;font-size:.82rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--pressure);margin-bottom:8px}
+.section-theory{font-size:.98rem;line-height:1.6;color:#726565;max-width:58ch;margin-bottom:14px}
+.formula-box{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;
+  border-radius:18px;background:#FFF0DC;border:2px solid #F2E3CC;box-shadow:0 5px 16px rgba(59,43,43,.08);
+  font-family:'Fredoka One',sans-serif;font-size:1.2rem;color:var(--pressure);margin-bottom:18px}
+
+.hook-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.hook-bubble{border-radius:999px;min-height:132px;display:flex;align-items:center;justify-content:center;
+  text-align:center;opacity:0;transform:translateY(18px) scale(.94);transition:opacity .55s ease,transform .55s cubic-bezier(.34,1.56,.64,1)}
+.hook-bubble.visible{opacity:1;transform:none}
+.hook-bubble p{font-family:'Fredoka One',sans-serif;font-size:clamp(1.1rem,3vw,1.5rem);line-height:1.35}
+.hook-thought{margin:18px auto 8px;max-width:680px;text-align:center;font-family:'Fredoka One',sans-serif;
+  font-size:clamp(1.15rem,3.2vw,1.8rem);line-height:1.35;opacity:0;transform:translateY(12px);
+  transition:opacity .55s ease,transform .55s ease}
+.hook-thought.visible{opacity:1;transform:none}
+.hook-arrow{margin-top:10px;text-align:center;font-family:'Fredoka One',sans-serif;font-size:1rem;
+  color:var(--pressure);opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease}
+.hook-arrow.visible{opacity:1;transform:none}
+
+.pressure-types-flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0 16px}
+.pressure-type-node{flex:1 1 150px;min-width:150px;background:#fff;border:3px solid #F2E3CC;
+  border-radius:999px;padding:12px 14px;font-family:'Fredoka One',sans-serif;font-size:.9rem;color:var(--ink);
+  box-shadow:0 8px 18px rgba(59,43,43,.08);cursor:pointer;text-align:center}
+.pressure-type-node.active{background:var(--pressure);color:#fff;border-color:transparent}
+.type-connector{width:30px;height:20px;flex:0 0 auto;overflow:visible}
+.type-connector path{fill:none;stroke:#FF9F2E;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:110;stroke-dashoffset:110;transition:stroke-dashoffset .85s ease}
+.pressure-types-flow.flow-drawn .type-connector path{stroke-dashoffset:0}
+.pressure-type-detail{max-height:0;overflow:hidden;opacity:0;transition:max-height .45s ease,opacity .35s ease}
+.pressure-type-detail.open{max-height:560px;opacity:1}
+.pressure-type-panel{display:grid;grid-template-columns:180px minmax(0,1fr);gap:16px;align-items:center;padding-top:8px}
+.pressure-type-panel svg{width:100%;max-width:180px;display:block}
+.pressure-type-panel h4{font-family:'Fredoka One',sans-serif;font-size:1.1rem;margin-bottom:8px}
+.pressure-type-panel p{font-size:1rem;line-height:1.6;color:#675858}
+.pressure-type-example{margin-top:10px;display:inline-block;background:#FFF0DC;border:2px solid #F2E3CC;
+  border-radius:999px;padding:7px 14px;font-family:'Fredoka One',sans-serif;font-size:.88rem}
+
+.quiz-container{display:flex;flex-direction:column;gap:14px}
+.quiz-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center}
+.quiz-meta{font-family:'Fredoka One',sans-serif;font-size:.86rem;color:var(--pressure)}
+.quiz-progress{height:10px;background:#F2E3CC;border-radius:999px;overflow:hidden}
+.quiz-progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--tomato),var(--pressure));border-radius:999px;transition:width .3s ease}
+.quiz-question-view h3{font-family:'Fredoka One',sans-serif;font-size:1.25rem;line-height:1.35;margin-top:4px}
+.quiz-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.quiz-opt{background:#fff;border:2px solid #F2E3CC;border-radius:18px;padding:12px 14px;text-align:left;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer}
+.quiz-opt:disabled{cursor:default;opacity:.9}
+.opt-correct{border-color:var(--leaf);background:#edf9ef}
+.opt-wrong{border-color:var(--tomato);background:#fff0ef}
+.hint-text,.feedback-box{border-radius:18px;padding:12px 14px;line-height:1.55}
+.hint-text{display:none;background:#FFF0DC;color:#6d5c5c}
+.hint-text.hint-open{display:block}
+.feedback-box{display:none;background:#FFF0DC;color:#6d5c5c}
+.fb-show{display:block}
+.fb-correct{background:#edf9ef;color:#3d6b46}
+.fb-wrong{background:#fff0ef;color:#9b3a34}
+.quiz-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.quiz-results{display:none;text-align:center;padding:10px 0}
+.quiz-results.qr-show{display:block}
+.results-score{font-family:'Fredoka One',sans-serif;font-size:2rem;color:var(--pressure)}
+
+@media(max-width:720px){
+  .hook-grid,.quiz-options{grid-template-columns:1fr}
+  .pressure-types-flow{flex-direction:column;align-items:stretch}
+  .type-connector{width:24px;height:40px;align-self:center;transform:rotate(90deg)}
+  .pressure-type-node{min-width:0}
+  .section-nav .nav-tab{font-size:.78rem;padding:6px 12px}
+}
+
+/* SVG wrappers */
+.sim-svg{width:100%;display:block;overflow:visible}
+
+/* controls */
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;align-items:center}
+.btn{font-family:'Fredoka One',sans-serif;font-size:.95rem;padding:9px 20px;
+  border:none;border-radius:999px;cursor:pointer;transition:transform .1s,box-shadow .1s;
+  user-select:none;-webkit-user-select:none}
+.btn:active{transform:scale(.95)}
+.btn-primary{background:var(--tomato);color:#fff;box-shadow:0 4px 12px rgba(255,90,78,.3)}
+.btn-secondary{background:var(--area);color:#fff;box-shadow:0 4px 12px rgba(62,139,250,.3)}
+.btn-green{background:var(--leaf);color:#fff;box-shadow:0 4px 12px rgba(88,179,104,.3)}
+.btn-purple{background:var(--pressure);color:#fff;box-shadow:0 4px 12px rgba(160,78,246,.3)}
+.btn-outline{background:#fff;color:var(--ink);border:2px solid #E0D0C0}
+
+label.slider-label{font-weight:700;font-size:.9rem;white-space:nowrap}
+input[type=range]{-webkit-appearance:none;height:6px;border-radius:3px;
+  appearance:none;background:#E0D0C0;outline:none;cursor:pointer;flex:1;min-width:120px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;
+  border-radius:50%;background:var(--pressure);cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.2)}
+
+/* insight pill */
+.insight{margin-top:14px;opacity:0;transition:opacity .6s;
+  pointer-events:none}
+.insight.visible{opacity:1;pointer-events:auto}
+.insight-pill{display:inline-block;background:var(--pressure);color:#fff;
+  font-family:'Fredoka One',sans-serif;font-size:.95rem;border-radius:999px;
+  padding:8px 22px;line-height:1.4}
+
+/* readout chips */
+.readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{font-family:'Fredoka One',sans-serif;font-size:.85rem;padding:5px 14px;
+  border-radius:999px;white-space:nowrap}
+.chip-f{background:#FFF0DC;color:var(--force)}
+.chip-a{background:#DCF0FF;color:var(--area)}
+.chip-p{background:#F0DCFF;color:var(--pressure)}
+
+/* footer */
+footer{text-align:center;padding:30px 20px;font-size:.85rem;color:#aaa}
+
+/* ═══ DECORATIVE POLISH ══════════════════════════════════════ */
+
+/* background warm gradient cycle */
+@keyframes bgShift{0%{background-color:#FFF6E9}50%{background-color:#FFF0DC}100%{background-color:#FFFBF5}}
+body{animation:bgShift 8s ease-in-out infinite alternate}
+
+/* floating physics symbols */
+@keyframes floatUp{
+  0%  {transform:translateY(0) translateX(0) rotate(0deg);opacity:0}
+  8%  {opacity:.07}
+  92% {opacity:.07}
+  100%{transform:translateY(-110vh) translateX(var(--drift,30px)) rotate(360deg);opacity:0}
+}
+.float-sym{position:fixed;bottom:-60px;pointer-events:none;z-index:0;opacity:0;user-select:none;
+  animation:floatUp var(--dur,14s) linear infinite;animation-delay:var(--delay,0s)}
+
+/* scroll progress bar */
+.scroll-progress{position:fixed;top:58px;left:0;width:0%;height:3px;z-index:110;
+  background:#58B368;transition:background .3s}
+
+/* page header gradient title */
+@keyframes titleGrad{
+  0%  {background-position:0%   50%}
+  50% {background-position:100% 50%}
+  100%{background-position:0%   50%}
+}
+.title-gradient{
+  background:linear-gradient(90deg,#FF5A4E,#A04EF6,#FF9F2E,#3E8BFA,#FF5A4E);
+  background-size:300% 300%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:titleGrad 5s ease infinite;
+}
+
+.cards > .card,
+.cards > section{scroll-margin-top:120px}
+
+/* typewriter cursor */
+.typewriter-cursor{border-right:2.5px solid #6b5a5a;animation:cursorBlink .75s step-end infinite}
+@keyframes cursorBlink{0%,100%{opacity:0}50%{opacity:1}}
+
+/* stat badges */
+.stat-badges{display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.stat-badge{
+  background:#fff;border:2px solid #F2E3CC;border-radius:999px;
+  padding:7px 18px;font-family:'Fredoka One',sans-serif;font-size:.92rem;
+  color:var(--ink);box-shadow:0 4px 14px rgba(59,43,43,.10);
+  opacity:0;transform:scale(.5) translateY(12px);
+  transition:opacity .45s cubic-bezier(.34,1.56,.64,1),transform .45s cubic-bezier(.34,1.56,.64,1);
+}
+.stat-badge.pop{opacity:1;transform:none}
+
+/* section number watermarks */
+.card{position:relative;transition:transform .3s ease,box-shadow .3s ease}
+.card-num{position:absolute;top:4px;right:14px;font-family:'Fredoka One',sans-serif;font-size:120px;
+  line-height:1;color:var(--ink);opacity:.04;pointer-events:none;user-select:none;z-index:0}
+
+/* card hover lift + theme glow */
+.card:hover{transform:translateY(-6px)}
+#card1:hover{box-shadow:0 20px 48px rgba(255,159,46,.28)}
+#card2:hover{box-shadow:0 20px 48px rgba(62,139,250,.28)}
+#card3:hover{box-shadow:0 20px 48px rgba(46,196,182,.28)}
+#card4:hover{box-shadow:0 20px 48px rgba(160,78,246,.28)}
+#card5:hover{box-shadow:0 20px 48px rgba(255,90,78,.28)}
+#card6:hover{box-shadow:0 20px 48px rgba(255,107,53,.28)}
+
+/* between-card dividers */
+.card-divider{display:flex;align-items:center;justify-content:center;height:52px}
+
+/* divider 1 — pulsing orange arrow */
+.div-arrow{font-size:26px;color:#FF9F2E;animation:arrowPulse 1.2s ease-in-out infinite}
+@keyframes arrowPulse{
+  0%,100%{transform:scale(1)   translateY(0);  filter:drop-shadow(0 0 4px rgba(255,159,46,.4))}
+  50%    {transform:scale(1.3) translateY(4px); filter:drop-shadow(0 0 14px rgba(255,159,46,.8))}
+}
+
+/* divider 2 — water ripples */
+.div-ripple{position:relative;width:56px;height:40px}
+.ripple-ring{position:absolute;border:2px solid #3E8BFA;border-radius:50%;
+  left:50%;top:50%;animation:rippleOut 2s ease-out infinite}
+.ripple-ring:nth-child(2){animation-delay:.67s}
+.ripple-ring:nth-child(3){animation-delay:1.33s}
+@keyframes rippleOut{
+  0%  {width:6px; height:6px; margin-left:-3px; margin-top:-3px; opacity:.9}
+  100%{width:54px;height:54px;margin-left:-27px;margin-top:-27px;opacity:0}
+}
+
+/* divider 3 — bouncing gas dots */
+.div-particles{display:flex;gap:10px;align-items:center}
+.gas-dot{width:10px;height:10px;border-radius:50%;animation:gasBounce .7s ease-in-out infinite alternate}
+.gas-dot:nth-child(1){background:#A04EF6;animation-delay:0s}
+.gas-dot:nth-child(2){background:#FF9F2E;animation-delay:.23s}
+.gas-dot:nth-child(3){background:#3E8BFA;animation-delay:.46s}
+@keyframes gasBounce{from{transform:translateY(0)}to{transform:translateY(-18px)}}
+
+/* divider 4 — heartbeat pulse line */
+.div-heartbeat{display:flex;align-items:center}
+.hb-path{stroke:#FF5A4E;stroke-width:2.5;fill:none;
+  stroke-dasharray:240;stroke-dashoffset:240;animation:hbDraw 2s linear infinite}
+@keyframes hbDraw{
+  0%  {stroke-dashoffset:240;opacity:1}
+  80% {stroke-dashoffset:0;  opacity:1}
+  100%{stroke-dashoffset:0;  opacity:0}
+}
+
+/* divider 5 — CSS flame */
+.div-flame{display:flex;gap:5px;align-items:flex-end}
+.flame-bit{border-radius:50% 50% 30% 30%;
+  animation:fDance .35s ease-in-out infinite alternate;transform-origin:bottom center}
+.flame-bit:nth-child(1){width:7px; height:20px;background:#FF5A4E;animation-delay:0s}
+.flame-bit:nth-child(2){width:9px; height:28px;background:#FF9F2E;animation-delay:.08s}
+.flame-bit:nth-child(3){width:11px;height:34px;background:#FFCA28;animation-delay:.04s}
+.flame-bit:nth-child(4){width:9px; height:28px;background:#FF9F2E;animation-delay:.12s}
+.flame-bit:nth-child(5){width:7px; height:20px;background:#FF5A4E;animation-delay:.16s}
+@keyframes fDance{
+  from{transform:scaleY(1)   scaleX(1)    rotate(-3deg)}
+  to  {transform:scaleY(1.3) scaleX(.82)  rotate( 3deg)}
+}
+
+/* reduced motion — kill decorative animations, show badges statically */
+@media(prefers-reduced-motion:reduce){
+  .float-sym{display:none}
+  .stat-badge{opacity:1!important;transform:none!important}
+  body,
+  .title-gradient,
+  .typewriter-cursor,
+  .div-arrow,.ripple-ring,.gas-dot,.hb-path,.flame-bit{animation:none!important}
+}
+
+/* reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;transition-duration:.001s!important}
+}
+
+/* CARD 5 ECG animation — continuous loop */
+@keyframes ecg-travel{
+  0%{stroke-dashoffset:520}
+  100%{stroke-dashoffset:0}
+}
+.ecg-line{
+  stroke-dasharray:520;
+  stroke-dashoffset:520;
+  stroke:#58B368;
+  stroke-width:2.5;
+  fill:none;
+  animation:ecg-travel 0.86s linear infinite; /* 70 bpm default; JS updates duration on stress change */
+}
+
+/* CARD 6 Rocket Launch */
+@keyframes flame-flicker{
+  0%,100%{transform:scaleY(1) scaleX(1)}
+  25%{transform:scaleY(1.3) scaleX(.85)}
+  50%{transform:scaleY(.9) scaleX(1.1)}
+  75%{transform:scaleY(1.2) scaleX(.9)}
+}
+.flame-active{animation:flame-flicker .12s ease-in-out infinite;transform-origin:50% 0%;transform-box:fill-box}
+@keyframes card-shake{
+  0%,100%{transform:none}
+  15%{transform:translateX(-5px) rotate(-.4deg)}
+  30%{transform:translateX(5px) rotate(.4deg)}
+  45%{transform:translateX(-3px)}
+  60%{transform:translateX(3px)}
+  75%{transform:translateX(-2px)}
+  90%{transform:translateX(1px)}
+}
+.card-shake{animation:card-shake .5s ease-out}
+
+/* Scroll pressure gauge — fixed right edge */
+.scroll-gauge{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:90;
+  display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 7px;
+  background:rgba(255,246,233,.97);border:2px solid #F2E3CC;
+  border-radius:14px 0 0 14px;box-shadow:-4px 0 18px rgba(59,43,43,.13);min-width:44px}
+.sg-title{font-family:'Fredoka One',sans-serif;font-size:.62rem;color:var(--pressure);
+  text-align:center;letter-spacing:.5px}
+.gauge-track{width:14px;height:130px;background:#E0D0C0;border-radius:7px;
+  position:relative;overflow:hidden;border:2px solid #ccc}
+.gauge-fill{position:absolute;bottom:0;left:0;right:0;height:0%;border-radius:7px;
+  background:#58B368;transition:height .25s ease,background .25s ease}
+.gauge-fill.glow{box-shadow:0 0 10px #FF5A4E,0 0 20px rgba(255,90,78,.45)}
+.sg-val{font-family:'Fredoka One',sans-serif;font-size:.58rem;color:var(--ink-soft);
+  text-align:center;max-width:38px;line-height:1.25;word-break:break-all}
+
+/* ═══ CUSTOM CURSOR — ENHANCED ════════════════════════ */
+.cursor-dot,.cursor-ring,.cursor-ring2,.cursor-label{display:none}
+.custom-cursor-active{cursor:none!important}
+.custom-cursor-active *{cursor:none!important}
+.custom-cursor-active .cursor-dot,
+.custom-cursor-active .cursor-ring,
+.custom-cursor-active .cursor-ring2,
+.custom-cursor-active .cursor-label{display:block}
+
+/* inner dot — glowing radial gradient with heartbeat pulse */
+.cursor-dot{
+  position:fixed;width:12px;height:12px;
+  background:radial-gradient(circle,#fff 35%,#FF9F2E 110%);
+  border:2px solid rgba(59,43,43,.4);
+  border-radius:50%;pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  left:-100px;top:-100px;will-change:left,top;
+  animation:dotPulse 1.6s ease-in-out infinite;
+}
+@keyframes dotPulse{
+  0%,100%{box-shadow:0 0 4px 2px rgba(255,255,255,.7), 0 0 0 0 rgba(160,78,246,.3)}
+  50%    {box-shadow:0 0 10px 5px rgba(255,255,255,1), 0 0 22px 8px rgba(160,78,246,.55)}
+}
+
+/* ring1 — fast spring via JS, 4-color gradient, glowing */
+.cursor-ring{
+  position:fixed;width:38px;height:38px;border-radius:50%;
+  pointer-events:none;z-index:99997;
+  left:-100px;top:-100px;
+  transform:translate(-50%,-50%);
+  background:conic-gradient(#FF5A4E,#A04EF6,#FF9F2E,#3E8BFA,#FF5A4E);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 3.5px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 3.5px));
+  animation:cursorSpin 2s linear infinite;
+  will-change:left,top;
+  filter:drop-shadow(0 0 5px rgba(160,78,246,.75));
+  transition:width .22s cubic-bezier(.34,1.56,.64,1),
+             height .22s cubic-bezier(.34,1.56,.64,1),
+             border-radius .2s ease,
+             filter .2s ease,
+             background .2s ease;
+}
+
+/* ring2 — slow spring, counter-rotates, ghost opacity */
+.cursor-ring2{
+  position:fixed;width:62px;height:62px;border-radius:50%;
+  pointer-events:none;z-index:99995;
+  left:-100px;top:-100px;
+  transform:translate(-50%,-50%);
+  background:conic-gradient(from 180deg,#FF9F2E,#FF5A4E,#3E8BFA,#A04EF6,#FF9F2E);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
+  opacity:.38;
+  animation:cursorSpin2 5s linear infinite;
+  will-change:left,top;
+  filter:drop-shadow(0 0 7px rgba(255,90,78,.5));
+  transition:width .28s cubic-bezier(.34,1.56,.64,1),
+             height .28s cubic-bezier(.34,1.56,.64,1),
+             opacity .22s ease;
+}
+
+@keyframes cursorSpin {
+  from{transform:translate(-50%,-50%) rotate(0deg)}
+  to  {transform:translate(-50%,-50%) rotate(360deg)}
+}
+@keyframes cursorSpin2{
+  from{transform:translate(-50%,-50%) rotate(360deg)}
+  to  {transform:translate(-50%,-50%) rotate(0deg)}
+}
+
+/* ── hover states ── */
+.cursor-dot.on-btn{background:radial-gradient(circle,#fff 30%,#FF9F2E 110%);border-color:#FF9F2E}
+.cursor-ring.on-btn{width:56px;height:56px;background:#FF9F2E;filter:drop-shadow(0 0 12px rgba(255,159,46,.95))}
+.cursor-ring2.on-btn{width:76px;height:76px;background:#FF9F2E;opacity:.28}
+
+.cursor-ring.on-slider{
+  width:78px;height:26px;border-radius:999px;
+  background:transparent;border:3px solid #3E8BFA;
+  -webkit-mask:none;mask:none;
+  filter:drop-shadow(0 0 9px rgba(62,139,250,.9));
+  animation:none!important;
+}
+.cursor-ring2.on-slider{opacity:0}
+
+.cursor-ring.on-card{
+  background:#A04EF6;
+  filter:drop-shadow(0 0 14px rgba(160,78,246,1));
+  animation:cursorPulse .5s ease-in-out infinite!important;
+}
+.cursor-ring2.on-card{background:#A04EF6;opacity:.3}
+
+.cursor-ring.on-nav{width:52px;height:52px;background:#FF5A4E;filter:drop-shadow(0 0 12px rgba(255,90,78,.95))}
+.cursor-ring2.on-nav{width:74px;height:74px;background:#FF5A4E;opacity:.28}
+
+/* pulse — ring1 only, ring2 handled by on-card size change */
+@keyframes cursorPulse{
+  0%,100%{transform:translate(-50%,-50%) scale(1)}
+  50%    {transform:translate(-50%,-50%) scale(1.45)}
+}
+
+/* click burst on ring1 (AFTER on-card so !important wins) */
+@keyframes cursorBurst{
+  0%  {width:38px;height:38px;opacity:1}
+  55% {width:96px;height:96px;opacity:0}
+  56% {width:38px;height:38px;opacity:1}
+  100%{width:38px;height:38px;opacity:1}
+}
+.cursor-ring.clicking{animation:cursorBurst .42s ease-out!important}
+
+/* ripple rings spawned by JS on click */
+@keyframes rippleClick{
+  from{transform:translate(-50%,-50%) scale(.4);opacity:1}
+  to  {transform:translate(-50%,-50%) scale(4);  opacity:0}
+}
+
+.cursor-label{
+  position:fixed;pointer-events:none;z-index:100000;
+  font-size:16px;line-height:1;display:none;
+  left:-100px;top:-100px;
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.9));
+}
+.custom-cursor-active .cursor-label{display:block}
+
+/* ghost trail dots — sized via inline style in JS */
+.cursor-ghost{
+  position:fixed;border-radius:50%;
+  pointer-events:none;z-index:99994;
+  transform:translate(-50%,-50%);
+  left:-100px;top:-100px;
+  will-change:left,top,opacity;
+}
+
+/* coarse pointer and reduced-motion: restore defaults, hide elements */
+@media(pointer:coarse){
+  .cursor-dot,.cursor-ring,.cursor-ring2,.cursor-ghost,.cursor-label{display:none!important}
+  .custom-cursor-active,.custom-cursor-active *{cursor:auto!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .cursor-dot,.cursor-ring,.cursor-ring2,.cursor-ghost,.cursor-label{display:none!important}
+  .custom-cursor-active,.custom-cursor-active *{cursor:auto!important}
+}
+</style>
+</head>
+<body>
+
+<!-- custom cursor elements -->
+<div class="cursor-dot"    id="cursor-dot"></div>
+<div class="cursor-ring"   id="cursor-ring"></div>
+<div class="cursor-ring2"  id="cursor-ring2"></div>
+<span class="cursor-label" id="cursor-label"></span>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-tab" data-page="play">🍅 Play</a>
+    <a href="learn.html"  class="nav-tab active" data-page="learn">📖 Learn</a>
+    <div class="nav-pill" aria-hidden="true"></div>
+  </div>
+</nav>
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<!-- fixed scroll pressure gauge -->
+<div class="scroll-gauge" id="scroll-gauge">
+  <div class="sg-title">P ↑</div>
+  <div class="gauge-track"><div class="gauge-fill" id="sg-fill"></div></div>
+  <div class="sg-val" id="sg-val">0 Pa</div>
+</div>
+
+<nav class="site-nav section-nav" aria-label="Section navigation">
+  <div class="nav-inner">
+    <a href="#section-hook" class="nav-tab active" data-section="section-hook">Hook</a>
+    <a href="#section-pressure" class="nav-tab" data-section="section-pressure">Pressure</a>
+    <a href="#section-types" class="nav-tab" data-section="section-types">Types</a>
+    <a href="#section-pascal" class="nav-tab" data-section="section-pascal">Pascal</a>
+    <a href="#section-underwater" class="nav-tab" data-section="section-underwater">Underwater</a>
+    <a href="#section-boyle" class="nav-tab" data-section="section-boyle">Boyle</a>
+    <a href="#section-blood" class="nav-tab" data-section="section-blood">Blood</a>
+    <a href="#section-apps" class="nav-tab" data-section="section-apps">Apps</a>
+    <a href="#section-quiz" class="nav-tab" data-section="section-quiz">Quiz</a>
+    <div class="nav-pill" aria-hidden="true"></div>
+  </div>
+</nav>
+
+<div class="page-header" id="hero-section">
+  <h1 class="title-gradient">Pressure &amp; Its Applications</h1>
+  <p><span id="subtitle-type"></span><span class="typewriter-cursor">|</span></p>
+  <div class="hero-actions">
+    <button class="btn btn-primary" type="button" onclick="document.getElementById('section-hook').scrollIntoView({behavior:'smooth',block:'start'})">Start Exploring</button>
+    <button class="btn btn-outline" type="button" onclick="document.getElementById('section-quiz').scrollIntoView({behavior:'smooth',block:'start'})">Take Quiz</button>
+  </div>
+  <div class="stat-badges">
+    <span class="stat-badge" id="sbadge-1">⚡ 6 Simulations</span>
+    <span class="stat-badge" id="sbadge-2">🎮 100% Interactive</span>
+    <span class="stat-badge" id="sbadge-3">📚 0% Boring</span>
+  </div>
+</div>
+
+<div class="cards">
+
+<section class="card" id="section-hook" data-section="section-hook">
+  <div class="section-label">01 — Remember This?</div>
+  <div class="hook-grid">
+    <div class="card hook-bubble" data-hook-bubble="0">
+      <p>Do you still remember <strong>Force</strong>? 💪</p>
+    </div>
+    <div class="card hook-bubble" data-hook-bubble="1">
+      <p>What about <strong>Area</strong>? 📐</p>
+    </div>
+  </div>
+  <div class="hook-thought" data-hook-reveal="0">What if Force and Area are <strong>BOTH</strong> involved at the same time...? 🤔</div>
+  <div class="hook-arrow">Let's find out ↓</div>
+</section>
+
+<section class="card" id="section-pressure" data-section="section-pressure">
+  <div class="section-label">02 — Foundation</div>
+  <div class="section-theory">Pressure is the amount of force acting on each unit of area. The smaller the area, the higher the pressure — even with the same force.</div>
+  <div class="formula-box">P = F ÷ A</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     CARD 1 · Sharp vs Blunt
+════════════════════════════════════════════════ -->
+<div class="card" id="card1">
+  <div class="card-title"><span class="em">💪</span> Sharp vs Blunt – What Changes?</div>
+
+  <svg class="sim-svg" id="knife-svg" viewBox="0 0 560 300" height="300">
+    <defs>
+      <linearGradient id="surface-grad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#58B368"/>
+        <stop offset="100%" stop-color="#2d7a40"/>
+      </linearGradient>
+    </defs>
+    <rect width="560" height="300" fill="#FFF6E9" rx="14"/>
+    <!-- surface block -->
+    <rect id="surface-rect" x="60" y="200" width="440" height="60" fill="url(#surface-grad)" rx="6"/>
+    <!-- deformation dent -->
+    <ellipse id="dent" cx="280" cy="200" rx="0" ry="0" fill="#2d7a40"/>
+    <!-- heatmap dots -->
+    <g id="heatmap"></g>
+    <!-- SHARP knife -->
+    <g id="knife-sharp" transform="translate(280,20)">
+      <polygon points="-3,0 3,0 1,90 -1,90" fill="#888" stroke="#555" stroke-width="1"/>
+      <rect x="-10" y="-30" width="20" height="35" rx="5" fill="#5c3d2e"/>
+      <rect x="-8" y="-5" width="16" height="5" rx="2" fill="#8B6954"/>
+      <text x="0" y="110" text-anchor="middle" fill="#888" font-family="Nunito" font-size="11">SHARP</text>
+    </g>
+    <!-- BLUNT knife -->
+    <g id="knife-blunt" transform="translate(280,20)" style="display:none">
+      <rect x="-12" y="0" width="24" height="85" rx="3" fill="#888" stroke="#555" stroke-width="1"/>
+      <rect x="-10" y="-30" width="20" height="35" rx="5" fill="#5c3d2e"/>
+      <rect x="-8" y="-5" width="16" height="5" rx="2" fill="#8B6954"/>
+      <text x="0" y="110" text-anchor="middle" fill="#888" font-family="Nunito" font-size="11">BLUNT</text>
+    </g>
+    <!-- labels -->
+    <text id="area-label" x="280" y="285" text-anchor="middle" font-family="Fredoka One" font-size="13" fill="#3E8BFA">Area: 6 mm²</text>
+  </svg>
+
+  <div class="controls">
+    <button class="btn btn-outline" onclick="setKnife('sharp')">🔪 Sharp</button>
+    <button class="btn btn-outline" onclick="setKnife('blunt')">🥄 Blunt</button>
+    <button class="btn btn-primary" id="btn-push"
+      onpointerdown="startPush()" onpointerup="stopPush()" onpointerleave="stopPush()">
+      Hold to PUSH ⬇
+    </button>
+  </div>
+  <div class="readout">
+    <div class="chip chip-f">F = <span id="c1-force">0</span> N</div>
+    <div class="chip chip-a">A = <span id="c1-area">6</span> mm²</div>
+    <div class="chip chip-p">P = <span id="c1-p">0</span> Pa</div>
+  </div>
+  <div class="insight" id="ins1">
+    <div class="insight-pill">Same force, smaller area → pressure skyrockets. That's why sharp knives cut!</div>
+  </div>
+</div>
+
+<section class="card" id="section-types" data-section="section-types">
+  <div class="section-label">03 — Types of Pressure</div>
+  <div class="card-title"><span class="em">🌍</span> Pressure Comes in Different Forms</div>
+  <div class="section-theory">Depending on where and how we measure it, pressure has different names.</div>
+  <div class="pressure-types-flow" id="pressure-types-flow">
+    <button type="button" class="pressure-type-node active" data-type="atmospheric">Atmospheric Pressure</button>
+    <svg class="type-connector" viewBox="0 0 30 20" aria-hidden="true"><path d="M2,10 C10,10 12,10 18,10 L26,10"/></svg>
+    <button type="button" class="pressure-type-node" data-type="gauge">Gauge Pressure</button>
+    <svg class="type-connector" viewBox="0 0 30 20" aria-hidden="true"><path d="M2,10 C10,10 12,10 18,10 L26,10"/></svg>
+    <button type="button" class="pressure-type-node" data-type="absolute">Absolute Pressure</button>
+    <svg class="type-connector" viewBox="0 0 30 20" aria-hidden="true"><path d="M2,10 C10,10 12,10 18,10 L26,10"/></svg>
+    <button type="button" class="pressure-type-node" data-type="differential">Differential Pressure</button>
+  </div>
+  <div class="pressure-type-detail" id="pressure-type-detail">
+    <div class="pressure-type-panel">
+      <svg id="pressure-type-svg" viewBox="0 0 180 180" aria-hidden="true"></svg>
+      <div>
+        <h4 id="pressure-type-title">Atmospheric Pressure</h4>
+        <p id="pressure-type-text">The weight of the entire air column above you pressing down.</p>
+        <div class="pressure-type-example" id="pressure-type-example">Why your ears pop on a plane ✈️</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- divider 1 -->
+<div class="card-divider" aria-hidden="true"><span class="div-arrow">↓</span></div>
+
+<section class="card" id="section-pascal" data-section="section-pascal">
+  <div class="section-label">04 — Fluid Pressure</div>
+  <div class="section-theory">When pressure is applied to a trapped fluid, it spreads equally in every direction. That is why a small input force can create a much larger output force in a hydraulic system.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     CARD 2 · Pascal Hydraulic Lift
+════════════════════════════════════════════════ -->
+<div class="card" id="card2">
+  <div class="card-title"><span class="em">🔵</span> Pascal's Law – Hydraulic Lift</div>
+
+  <svg class="sim-svg" id="pascal-svg" viewBox="0 0 560 310" height="310">
+    <defs>
+      <linearGradient id="fluid-grad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#3E8BFA" stop-opacity=".9"/>
+        <stop offset="100%" stop-color="#1a5fc8" stop-opacity=".9"/>
+      </linearGradient>
+      <linearGradient id="car-grad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#FF9F2E"/>
+        <stop offset="100%" stop-color="#d47800"/>
+      </linearGradient>
+      <marker id="ah-pascal" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+        <polygon points="0,0 8,4 0,8" fill="#FF9F2E"/>
+      </marker>
+      <marker id="ah-lift" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+        <polygon points="0,8 4,0 8,8" fill="#58B368"/>
+      </marker>
+    </defs>
+    <rect width="560" height="310" fill="#FFF6E9" rx="14"/>
+    <!-- ground -->
+    <rect x="0" y="270" width="560" height="40" fill="#e8d8c0"/>
+    <!-- left cylinder -->
+    <rect x="80" y="120" width="6" height="150" fill="#aaa"/>
+    <rect x="154" y="120" width="6" height="150" fill="#aaa"/>
+    <rect x="80" y="265" width="80" height="6" fill="#aaa"/>
+    <!-- right cylinder -->
+    <rect x="310" y="80" width="8" height="190" fill="#aaa"/>
+    <rect x="438" y="80" width="8" height="190" fill="#aaa"/>
+    <rect x="310" y="265" width="136" height="6" fill="#aaa"/>
+    <!-- connecting pipe -->
+    <rect x="155" y="246" width="156" height="20" fill="url(#fluid-grad)"/>
+    <!-- fluid -->
+    <rect id="fluid-left"  x="86"  y="200" width="62"  height="65" fill="url(#fluid-grad)"/>
+    <rect id="fluid-right" x="318" y="200" width="120" height="65" fill="url(#fluid-grad)"/>
+    <!-- left piston -->
+    <rect id="piston-left" x="80" y="192" width="80" height="14" rx="4" fill="#5c3d2e" cursor="ns-resize"/>
+    <text x="120" y="188" text-anchor="middle" font-family="Nunito" font-size="10" fill="#666">A=10 cm²</text>
+    <line id="arrow-left" x1="120" y1="155" x2="120" y2="185" stroke="#FF9F2E" stroke-width="3" marker-end="url(#ah-pascal)"/>
+    <text id="lbl-f-in" x="120" y="148" text-anchor="middle" font-family="Fredoka One" font-size="12" fill="#FF9F2E">F in</text>
+    <!-- right piston -->
+    <rect id="piston-right" x="310" y="192" width="136" height="14" rx="4" fill="#5c3d2e"/>
+    <text x="378" y="188" text-anchor="middle" font-family="Nunito" font-size="10" fill="#666">A=100 cm²</text>
+    <!-- car group -->
+    <g id="car-group">
+      <rect x="310" y="178" width="136" height="14" rx="3" fill="#888"/>
+      <rect x="328" y="130" width="100" height="44" rx="10" fill="url(#car-grad)"/>
+      <rect x="348" y="108" width="60" height="30" rx="8" fill="#FFB84E"/>
+      <rect x="354" y="113" width="20" height="18" rx="4" fill="#cde8ff"/>
+      <rect x="380" y="113" width="20" height="18" rx="4" fill="#cde8ff"/>
+      <circle cx="347" cy="178" r="10" fill="#333"/>
+      <circle cx="347" cy="178" r="4"  fill="#888"/>
+      <circle cx="411" cy="178" r="10" fill="#333"/>
+      <circle cx="411" cy="178" r="4"  fill="#888"/>
+      <line id="lift-arrow" x1="378" y1="175" x2="378" y2="150" stroke="#58B368" stroke-width="3" opacity="0" marker-end="url(#ah-lift)"/>
+    </g>
+    <text x="120" y="112" text-anchor="middle" font-family="Fredoka One" font-size="13" fill="#3E8BFA">Small Piston</text>
+    <text x="378" y="72"  text-anchor="middle" font-family="Fredoka One" font-size="13" fill="#3E8BFA">Large Piston</text>
+    <text x="220" y="262" text-anchor="middle" font-family="Fredoka One" font-size="12" fill="#fff">Same P!</text>
+  </svg>
+
+  <div class="controls">
+    <label class="slider-label" for="pascal-slider">Push left piston ⬇</label>
+    <input type="range" id="pascal-slider" min="0" max="100" value="0">
+  </div>
+  <div class="readout">
+    <div class="chip chip-f">F in = <span id="c2-fin">0</span> N</div>
+    <div class="chip chip-p">P = <span id="c2-p">0</span> kPa</div>
+    <div class="chip chip-f" style="background:#e6ffe6;color:var(--leaf)">F out = <span id="c2-fout">0</span> N</div>
+  </div>
+  <div class="insight" id="ins2">
+    <div class="insight-pill">Pressure spreads equally — a small push on tiny area lifts a car on big area!</div>
+  </div>
+</div>
+
+<section class="card" id="section-underwater" data-section="section-underwater">
+  <div class="section-label">05 — Depth &amp; Pressure</div>
+  <div class="section-theory">Water pressure increases with depth because more water sits above you. That extra weight pushes harder on everything below the surface.</div>
+</section>
+
+<!-- divider 2 -->
+<div class="card-divider" aria-hidden="true">
+  <div class="div-ripple"><div class="ripple-ring"></div><div class="ripple-ring"></div><div class="ripple-ring"></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     CARD 3 · Underwater Diver
+════════════════════════════════════════════════ -->
+<div class="card" id="card3">
+  <div class="card-title"><span class="em">🤿</span> Deep Dive – Hydrostatic Pressure</div>
+
+  <svg class="sim-svg" id="hydro-svg" viewBox="0 0 560 300" height="300">
+    <defs>
+      <linearGradient id="water-grad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#3E8BFA" stop-opacity=".55"/>
+        <stop offset="100%" stop-color="#1a3fa0" stop-opacity=".9"/>
+      </linearGradient>
+      <marker id="ah-hydro" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+        <polygon points="0,0 7,3.5 0,7" fill="#FF9F2E"/>
+      </marker>
+    </defs>
+    <rect width="560" height="300" fill="#e8f4ff" rx="14"/>
+    <rect x="40" y="10" width="480" height="35" fill="#cce8ff" rx="6"/>
+    <text x="280" y="31" text-anchor="middle" font-family="Nunito" font-size="11" fill="#4488bb">Surface — 0 m</text>
+    <rect x="40" y="40" width="480" height="240" fill="url(#water-grad)" rx="4"/>
+    <!-- depth ruler -->
+    <g font-family="Nunito" font-size="10" fill="#fff" opacity=".7">
+      <line x1="46" y1="88"  x2="52" y2="88"  stroke="#fff" opacity=".6"/>
+      <line x1="46" y1="136" x2="52" y2="136" stroke="#fff" opacity=".6"/>
+      <line x1="46" y1="184" x2="52" y2="184" stroke="#fff" opacity=".6"/>
+      <line x1="46" y1="232" x2="52" y2="232" stroke="#fff" opacity=".6"/>
+      <text x="54" y="92">10 m</text>
+      <text x="54" y="140">20 m</text>
+      <text x="54" y="188">30 m</text>
+      <text x="54" y="236">40 m</text>
+    </g>
+    <!-- pressure arrows -->
+    <line id="arr-left"  x1="230" y1="120" x2="255" y2="120" stroke="#FF9F2E" stroke-width="3" marker-end="url(#ah-hydro)"/>
+    <line id="arr-right" x1="330" y1="120" x2="305" y2="120" stroke="#FF9F2E" stroke-width="3" marker-end="url(#ah-hydro)"/>
+    <line id="arr-top"   x1="280" y1="90"  x2="280" y2="108" stroke="#FF9F2E" stroke-width="3" marker-end="url(#ah-hydro)"/>
+    <line id="arr-bot"   x1="280" y1="152" x2="280" y2="134" stroke="#FF9F2E" stroke-width="3" marker-end="url(#ah-hydro)"/>
+    <!-- diver -->
+    <g id="diver-group" transform="translate(280,120)">
+      <rect x="8" y="-2" width="10" height="22" rx="4" fill="#888"/>
+      <ellipse cx="0" cy="10" rx="14" ry="18" fill="#1a5fc8"/>
+      <ellipse cx="0" cy="10" rx="9"  ry="13" fill="#1244a0"/>
+      <circle  cx="0" cy="-12" r="12" fill="#FFD97D"/>
+      <rect x="-9" y="-18" width="18" height="10" rx="4" fill="#333"/>
+      <rect x="-7" y="-17" width="14" height="7"  rx="3" fill="#cde8ff" opacity=".8"/>
+      <line x1="9" y1="-15" x2="16" y2="-26" stroke="#FF5A4E" stroke-width="2.5"/>
+      <circle cx="16" cy="-27" r="2" fill="#FF5A4E"/>
+      <text id="diver-face" x="0" y="-9" text-anchor="middle" font-size="9" fill="#5c3d2e">😊</text>
+      <ellipse cx="-18" cy="28" rx="8" ry="4" fill="#1a5fc8" transform="rotate(-20,-18,28)"/>
+      <ellipse cx="18"  cy="28" rx="8" ry="4" fill="#1a5fc8" transform="rotate(20,18,28)"/>
+    </g>
+    <text id="hydro-p-lbl"     x="450" y="170" text-anchor="middle" font-family="Fredoka One" font-size="14" fill="#FFF6E9">P = 0 kPa</text>
+    <text id="hydro-depth-lbl" x="450" y="190" text-anchor="middle" font-family="Nunito"      font-size="11" fill="#cde8ff">depth = 0 m</text>
+  </svg>
+
+  <div class="controls">
+    <label class="slider-label" for="depth-slider">Depth</label>
+    <input type="range" id="depth-slider" min="0" max="40" value="0" step="1">
+    <span id="depth-val" style="font-weight:700;min-width:48px">0 m</span>
+  </div>
+  <div class="readout">
+    <div class="chip chip-p">P = ρgh = <span id="c3-p">0</span> kPa</div>
+    <div class="chip chip-a" style="background:#e6ffe6;color:var(--leaf)">+ atm = <span id="c3-abs">101</span> kPa total</div>
+  </div>
+  <div class="insight" id="ins3">
+    <div class="insight-pill">Every 10 m deeper adds ~100 kPa — equal to the whole atmosphere above!</div>
+  </div>
+</div>
+
+<section class="card" id="section-boyle" data-section="section-boyle">
+  <div class="section-label">06 — Gas Pressure</div>
+  <div class="section-theory">For a trapped gas, pressure rises when the gas is squeezed into a smaller space. More collisions happen in less room, so the pressure goes up.</div>
+</section>
+
+<!-- divider 3 -->
+<div class="card-divider" aria-hidden="true">
+  <div class="div-particles"><div class="gas-dot"></div><div class="gas-dot"></div><div class="gas-dot"></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     CARD 4 · Boyle's Law Bouncing Particles
+════════════════════════════════════════════════ -->
+<div class="card" id="card4">
+  <div class="card-title"><span class="em">🔴</span> Boyle's Law – Squeeze the Gas</div>
+
+  <svg class="sim-svg" id="boyle-svg" viewBox="0 0 560 300" height="300">
+    <defs>
+      <clipPath id="gas-clip">
+        <rect id="gas-clip-rect" x="80" y="40" width="300" height="220"/>
+      </clipPath>
+    </defs>
+    <rect width="560" height="300" fill="#FFF6E9" rx="14"/>
+    <!-- cylinder walls -->
+    <rect x="80"  y="40"  width="8"   height="220" fill="#aaa" rx="2"/>
+    <rect x="372" y="40"  width="8"   height="220" fill="#aaa" rx="2"/>
+    <rect x="80"  y="256" width="300" height="8"   fill="#aaa" rx="2"/>
+    <rect x="80"  y="36"  width="300" height="8"   fill="#aaa" rx="2"/>
+    <!-- gas region -->
+    <rect id="gas-bg" x="88" y="44" width="280" height="212" fill="#FFF0DC" opacity=".8"/>
+    <!-- particles -->
+    <g id="particles" clip-path="url(#gas-clip)"></g>
+    <!-- piston -->
+    <rect id="boyle-piston" x="352" y="36" width="30" height="228" rx="5" fill="#5c3d2e" cursor="ew-resize"/>
+    <text x="366" y="30" text-anchor="middle" font-family="Nunito" font-size="10" fill="#888">drag ←→</text>
+    <!-- gauge -->
+    <g transform="translate(470,145)">
+      <circle cx="0" cy="0" r="55" fill="#fff"    stroke="#E0D0C0" stroke-width="3"/>
+      <circle cx="0" cy="0" r="45" fill="#F8F0E8" stroke="#E0D0C0" stroke-width="1"/>
+      <g stroke="#ccc" stroke-width="1.5">
+        <line x1="0" y1="-38" x2="0" y2="-45" transform="rotate(-120)"/>
+        <line x1="0" y1="-38" x2="0" y2="-45" transform="rotate(-90)"/>
+        <line x1="0" y1="-38" x2="0" y2="-45" transform="rotate(-60)"/>
+        <line x1="0" y1="-38" x2="0" y2="-45" transform="rotate(-30)"/>
+        <line x1="0" y1="-38" x2="0" y2="-45" transform="rotate(0)"/>
+        <line x1="0" y1="-38" x2="0" y2="-45" transform="rotate(30)"/>
+        <line x1="0" y1="-38" x2="0" y2="-45" transform="rotate(60)"/>
+        <line x1="0" y1="-38" x2="0" y2="-45" transform="rotate(90)"/>
+        <line x1="0" y1="-38" x2="0" y2="-45" transform="rotate(120)"/>
+      </g>
+      <text x="0" y="-28" text-anchor="middle" font-size="7" fill="#999"   transform="rotate(-90)rotate(90,0,-28)">LOW</text>
+      <text x="0" y="-28" text-anchor="middle" font-size="7" fill="#A04EF6" transform="rotate(90)rotate(-90,0,-28)">HIGH</text>
+      <line id="gauge-needle" x1="0" y1="5" x2="0" y2="-38" stroke="#A04EF6" stroke-width="2.5" stroke-linecap="round" transform="rotate(-90)"/>
+      <circle cx="0" cy="0" r="4" fill="#A04EF6"/>
+      <text id="gauge-lbl" x="0" y="18" text-anchor="middle" font-family="Fredoka One" font-size="11" fill="#A04EF6">P₀</text>
+    </g>
+    <text x="470" y="215" text-anchor="middle" font-family="Nunito" font-size="10" fill="#888">PRESSURE</text>
+    <text id="boyle-v-lbl" x="220" y="295" text-anchor="middle" font-family="Fredoka One" font-size="13" fill="#FF9F2E">V = 100%</text>
+  </svg>
+
+  <div class="controls">
+    <span style="font-size:.9rem;font-weight:700">Drag the brown piston left ←</span>
+  </div>
+  <div class="readout">
+    <div class="chip chip-a">V = <span id="c4-v">100</span>%</div>
+    <div class="chip chip-p">P = <span id="c4-p">1.0</span>× P₀</div>
+  </div>
+  <div class="insight" id="ins4">
+    <div class="insight-pill">Halve the volume → double the pressure. P × V = constant!</div>
+  </div>
+</div>
+
+<section class="card" id="section-blood" data-section="section-blood">
+  <div class="section-label">07 — Biology</div>
+  <div class="section-theory">Your heart creates pressure to move blood through a large network of vessels. When the heart beats harder or faster, blood pressure changes too.</div>
+</section>
+
+<!-- divider 4 -->
+<div class="card-divider" aria-hidden="true">
+  <div class="div-heartbeat">
+    <svg width="160" height="32" viewBox="0 0 160 32">
+      <path class="hb-path" d="M0,16 L28,16 L38,4 L43,28 L48,2 L54,16 L80,16 L108,16 L118,8 L123,24 L128,6 L133,16 L160,16"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     CARD 5 · Blood Pressure
+════════════════════════════════════════════════ -->
+<div class="card" id="card5">
+  <div class="card-title"><span class="em">🫀</span> Blood Pressure – Feel Your Pulse</div>
+
+  <svg class="sim-svg" id="bp-svg" viewBox="0 0 560 280" height="280">
+    <defs>
+      <linearGradient id="artery-grad" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="#ff6b81"/>
+        <stop offset="100%" stop-color="#c0392b"/>
+      </linearGradient>
+      <filter id="glow-red">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <rect width="560" height="280" fill="#FFF6E9" rx="14"/>
+    <!-- heart -->
+    <g id="heart-group" transform="translate(110,130)" cursor="pointer" style="user-select:none">
+      <path d="M0,-20 C20,-50 55,-35 55,0 C55,30 25,55 0,75 C-25,55 -55,30 -55,0 C-55,-35 -20,-50 0,-20Z"
+        fill="#FF5A4E" filter="url(#glow-red)"/>
+      <text x="0" y="15" text-anchor="middle" font-size="22">❤️</text>
+      <text x="0" y="95" text-anchor="middle" font-family="Fredoka One" font-size="12" fill="#FF5A4E">Click to beat!</text>
+    </g>
+    <!-- artery -->
+    <rect x="200" y="100" width="300" height="50" rx="25" fill="#f4a0a0" opacity=".4"/>
+    <rect id="artery-lumen" x="205" y="108" width="290" height="34" rx="17" fill="url(#artery-grad)" opacity=".7"/>
+    <path id="pulse-wave" d="M205,125 Q280,125 350,125 Q420,125 495,125" stroke="#fff" stroke-width="2" fill="none" opacity=".6"/>
+    <!-- ECG box -->
+    <rect x="200" y="165" width="300" height="90" rx="10" fill="#1a1a2e"/>
+    <text x="210" y="183" font-family="Nunito" font-size="10" fill="#58B368">ECG</text>
+    <line x1="210" y1="215" x2="490" y2="215" stroke="#333" stroke-width="1"/>
+    <path id="ecg-path" class="ecg-line"
+      d="M210,215 L240,215 L250,215 L255,195 L260,240 L265,185 L272,215 L290,215 L300,215 L310,215 L320,215 L340,215 L345,205 L350,230 L355,200 L360,215 L490,215"/>
+    <!-- BP readout -->
+    <text x="110" y="240" text-anchor="middle" font-family="Fredoka One" font-size="14" fill="#FF5A4E">Systolic</text>
+    <text id="sys-val" x="110" y="260" text-anchor="middle" font-family="Fredoka One" font-size="22" fill="#FF5A4E">120</text>
+    <text x="110" y="277" text-anchor="middle" font-family="Nunito" font-size="10" fill="#aaa">mmHg</text>
+    <text id="bp-stress-lbl" x="350" y="265" text-anchor="middle" font-family="Fredoka One" font-size="12" fill="#FF9F2E">Stress: Normal</text>
+  </svg>
+
+  <div class="controls">
+    <button class="btn btn-primary" onclick="triggerHeartbeat()">💓 Beat</button>
+    <label class="slider-label" for="stress-slider">Stress level:</label>
+    <input type="range" id="stress-slider" min="0" max="100" value="0">
+  </div>
+  <div class="readout">
+    <div class="chip chip-f" style="background:#ffe0e0;color:#c0392b">Systolic:  <span id="c5-sys">120</span> mmHg</div>
+    <div class="chip chip-a" style="background:#e0eeff;color:#2980b9">Diastolic: <span id="c5-dia">80</span>  mmHg</div>
+  </div>
+  <div class="insight" id="ins5">
+    <div class="insight-pill">Your heart creates pressure to push blood through 100,000 km of vessels!</div>
+  </div>
+</div>
+
+<section class="card" id="section-apps" data-section="section-apps">
+  <div class="section-label">08 — Real World</div>
+  <div class="card-title"><span class="em">🧰</span> Real World Applications</div>
+  <div class="section-theory">Pressure shows up everywhere in daily life, from cutting tools and car tyres to breathing, building machines, and moving vehicles.</div>
+  <div class="app-grid">
+    <div class="app-card"><h4>Sharp Tools</h4><p>Needles and blades use tiny areas to increase pressure.</p></div>
+    <div class="app-card"><h4>Tyres</h4><p>Gauge pressure helps keep cars stable and safe.</p></div>
+    <div class="app-card"><h4>Hydraulics</h4><p>Brakes and lifts move huge loads with fluid pressure.</p></div>
+    <div class="app-card"><h4>Water Depth</h4><p>Divers and submarines feel increasing pressure below the surface.</p></div>
+    <div class="app-card"><h4>Breathing</h4><p>Lungs create pressure changes so air can move in and out.</p></div>
+    <div class="app-card"><h4>Space Rockets</h4><p>Hot gas escaping downward pushes rockets upward.</p></div>
+  </div>
+</section>
+
+<section class="card" id="section-quiz" data-section="section-quiz">
+  <div class="section-label">09 — Knowledge Check</div>
+  <div class="card-title"><span class="em">🎯</span> Quiz Challenge</div>
+  <div class="quiz-container" id="quiz-container">
+    <div class="quiz-top">
+      <div class="quiz-meta quiz-meta-q">Question 1 of 7</div>
+      <div class="quiz-meta quiz-meta-score">Score: 0/7</div>
+    </div>
+    <div class="quiz-progress"><div class="quiz-progress-fill"></div></div>
+    <div class="quiz-question-view">
+      <div class="quiz-q-wrap"><h3>Loading question…</h3></div>
+      <div class="quiz-options"></div>
+      <div class="quiz-actions">
+        <button class="btn btn-outline hint-btn" type="button" aria-expanded="false">Hint</button>
+        <button class="btn btn-primary next-btn" type="button">Next Question →</button>
+      </div>
+      <div class="hint-text">Hint text</div>
+      <div class="feedback-box"></div>
+    </div>
+    <div class="quiz-results">
+      <div style="font-family:'Fredoka One',sans-serif;font-size:1.4rem;color:var(--pressure);">Final Score</div>
+      <div class="results-score">0 / 7</div>
+      <div class="results-msg">Great work.</div>
+      <button class="btn btn-primary try-again-btn" type="button">Try Again</button>
+    </div>
+  </div>
+</section>
+
+<!-- divider 5 -->
+<div class="card-divider" aria-hidden="true">
+  <div class="div-flame">
+    <div class="flame-bit"></div><div class="flame-bit"></div><div class="flame-bit"></div>
+    <div class="flame-bit"></div><div class="flame-bit"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     CARD 6 · Rocket Launch
+════════════════════════════════════════════════ -->
+<div class="card" id="card6">
+  <div class="card-title"><span class="em">🚀</span> Rocket Launch – Pressure Powers Space!</div>
+
+  <svg class="sim-svg" id="rocket-svg" viewBox="0 0 560 320" height="320">
+    <!-- night sky -->
+    <rect width="560" height="320" fill="#0a1628" rx="14"/>
+    <!-- stars -->
+    <g fill="#fff" opacity=".75">
+      <circle cx="40"  cy="20"  r="1.5"/><circle cx="120" cy="45"  r="1"/>
+      <circle cx="200" cy="15"  r="2"/>  <circle cx="300" cy="35"  r="1.5"/>
+      <circle cx="380" cy="22"  r="1"/>  <circle cx="460" cy="50"  r="2"/>
+      <circle cx="530" cy="30"  r="1.5"/><circle cx="80"  cy="60"  r="1"/>
+      <circle cx="160" cy="80"  r="1.5"/><circle cx="250" cy="55"  r="1"/>
+      <circle cx="420" cy="75"  r="2"/>  <circle cx="500" cy="18"  r="1"/>
+      <circle cx="70"  cy="100" r="1"/>  <circle cx="350" cy="70"  r="1.5"/>
+      <circle cx="490" cy="95"  r="1"/>
+    </g>
+    <!-- smoke trail -->
+    <g id="rocket-smoke"></g>
+    <!-- launch pad -->
+    <rect x="200" y="282" width="160" height="16" rx="6" fill="#555"/>
+    <rect x="228" y="268" width="104" height="18" rx="4" fill="#777"/>
+    <rect x="254" y="256" width="52"  height="16" rx="3" fill="#888"/>
+    <!-- support arms -->
+    <g id="launch-arms">
+      <rect x="238" y="218" width="7" height="42" rx="3" fill="#556"/>
+      <rect x="315" y="218" width="7" height="42" rx="3" fill="#556"/>
+    </g>
+    <!-- flames -->
+    <g id="rocket-flames" opacity="0" transform="translate(280,270)">
+      <ellipse cx="0"  cy="0"   rx="18" ry="30" fill="#FF9F2E"/>
+      <ellipse cx="-7" cy="-4"  rx="11" ry="22" fill="#FF5A4E"/>
+      <ellipse cx="7"  cy="-4"  rx="11" ry="22" fill="#FF5A4E"/>
+      <ellipse cx="0"  cy="-8"  rx="7"  ry="16" fill="#FFFDE7"/>
+      <ellipse cx="-5" cy="0"   rx="5"  ry="11" fill="#FFD54F"/>
+      <ellipse cx="5"  cy="0"   rx="5"  ry="11" fill="#FFD54F"/>
+    </g>
+    <!-- rocket -->
+    <g id="rocket-group" transform="translate(280,215)">
+      <ellipse cx="0" cy="0" rx="22" ry="50" fill="#DDE2E8"/>
+      <ellipse cx="0" cy="0" rx="20" ry="48" fill="#F0F4F8"/>
+      <!-- nose cone -->
+      <path d="M-22,-20 Q0,-70 22,-20Z" fill="#FF5A4E"/>
+      <path d="M-12,-20 Q0,-58 12,-20Z" fill="#E2392E"/>
+      <!-- porthole -->
+      <circle cx="0" cy="-8" r="11" fill="#3E8BFA" opacity=".9"/>
+      <circle cx="0" cy="-8" r="8"  fill="#1a5fc8"/>
+      <circle cx="-3" cy="-11" r="3" fill="#7EC8FF" opacity=".7"/>
+      <!-- stripes -->
+      <rect x="-22" y="8"  width="44" height="7" rx="2" fill="#FF9F2E" opacity=".85"/>
+      <rect x="-22" y="21" width="44" height="7" rx="2" fill="#FF9F2E" opacity=".85"/>
+      <!-- fins -->
+      <path d="M-22,32 L-40,58 L-22,52Z" fill="#FF5A4E"/>
+      <path d="M22,32  L40,58  L22,52Z"  fill="#FF5A4E"/>
+      <!-- nozzle -->
+      <ellipse cx="0" cy="52" rx="15" ry="7" fill="#777"/>
+      <ellipse cx="0" cy="52" rx="10" ry="5" fill="#444"/>
+    </g>
+    <!-- thrust gauge panel -->
+    <g transform="translate(496,48)">
+      <rect x="-22" y="-6" width="58" height="216" rx="8" fill="#0d1f33" opacity=".95"/>
+      <text x="7" y="12" text-anchor="middle" font-family="Fredoka One" font-size="9" fill="#8ab">THRUST</text>
+      <rect x="-4"  y="20" width="22" height="152" rx="4" fill="#071020" stroke="#1e3a5a" stroke-width="1"/>
+      <rect id="thrust-gauge-fill" x="-3" y="171" width="20" height="0" rx="3" fill="#58B368"/>
+      <line x1="18" y1="44"  x2="25" y2="44"  stroke="#334" stroke-width="1.5"/>
+      <line x1="18" y1="82"  x2="25" y2="82"  stroke="#334" stroke-width="1.5"/>
+      <line x1="18" y1="120" x2="25" y2="120" stroke="#334" stroke-width="1.5"/>
+      <line x1="18" y1="158" x2="25" y2="158" stroke="#334" stroke-width="1.5"/>
+      <text x="27" y="47"  font-family="Nunito" font-size="7.5" fill="#667">MAX</text>
+      <text x="27" y="161" font-family="Nunito" font-size="7.5" fill="#667">0</text>
+      <text id="thrust-pct-lbl" x="7" y="190" text-anchor="middle" font-family="Fredoka One" font-size="9" fill="#58B368">0%</text>
+    </g>
+    <!-- liftoff badge -->
+    <g id="liftoff-badge" opacity="0">
+      <rect x="28" y="82" width="370" height="60" rx="12" fill="#0d2a1a" stroke="#58B368" stroke-width="2"/>
+      <text x="213" y="108" text-anchor="middle" font-family="Fredoka One" font-size="12" fill="#58B368">🚀 Liftoff at 28,000 km/h!</text>
+      <text x="213" y="130" text-anchor="middle" font-family="Nunito" font-size="9.5" fill="#88ee88">Pressure from burning fuel powers the rocket up!</text>
+    </g>
+  </svg>
+
+  <div class="controls">
+    <button class="btn btn-primary" id="btn-ignite" onclick="igniteRocket()">🔥 IGNITE</button>
+    <button class="btn btn-outline"  id="btn-rocket-reset" onclick="resetRocket()" style="display:none">🔄 Reset</button>
+    <div class="chip chip-p" style="margin-left:8px">Thrust: <span id="c6-thrust">0</span> N</div>
+  </div>
+  <div class="insight" id="ins6">
+    <div class="insight-pill">Burning fuel creates massive pressure — nowhere to go but DOWN, so the rocket goes UP! 🚀</div>
+  </div>
+</div>
+
+</div><!-- end .cards -->
+
+<footer>Made for PressureVerse &nbsp;·&nbsp; Pressure = Force ÷ Area</footer>
+
+<script>
+/* ══════════════════════════════════
+   NAV PILL
+══════════════════════════════════ */
+(function(){
+  document.querySelectorAll('.nav-inner').forEach(inner => {
+    const pill  = inner.querySelector('.nav-pill');
+    if(!pill) return;
+    function pos(){
+      const active = inner.querySelector('.nav-tab.active');
+      if(!active) return;
+      const iR = inner.getBoundingClientRect();
+      const aR = active.getBoundingClientRect();
+      pill.style.left  = (aR.left - iR.left)+'px';
+      pill.style.width = aR.width+'px';
+    }
+    pos();
+    window.addEventListener('resize', pos);
+  });
+})();
+
+/* ══════════════════════════════════
+   HELPER
+══════════════════════════════════ */
+function showInsight(id){
+  const el = document.getElementById(id);
+  if(el && !el.classList.contains('visible')) el.classList.add('visible');
+}
+
+function initSectionNav(){
+  const links = [...document.querySelectorAll('.section-nav .nav-tab[data-section]')];
+  const sections = links.map(link => document.getElementById(link.dataset.section)).filter(Boolean);
+  if(!links.length || !sections.length) return;
+
+  function setActive(id){
+    links.forEach(link => link.classList.toggle('active', link.dataset.section === id));
+    const inner = document.querySelector('.section-nav .nav-inner');
+    if(!inner) return;
+    const pill = inner.querySelector('.nav-pill');
+    const active = inner.querySelector('.nav-tab.active');
+    if(!pill || !active) return;
+    const iR = inner.getBoundingClientRect();
+    const aR = active.getBoundingClientRect();
+    pill.style.left = (aR.left - iR.left) + 'px';
+    pill.style.width = aR.width + 'px';
+  }
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin:'-22% 0px -68% 0px', threshold:0.1 });
+
+  sections.forEach(section => io.observe(section));
+  setActive('section-hook');
+}
+
+function initHookSection(){
+  const section = document.getElementById('section-hook');
+  if(!section) return;
+  const bubbles = [...section.querySelectorAll('.hook-bubble')];
+  const thought = section.querySelector('.hook-thought');
+  const arrow = section.querySelector('.hook-arrow');
+  const reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let played = false;
+
+  function reveal(){
+    if(played) return;
+    played = true;
+    bubbles.forEach((bubble, index) => setTimeout(() => bubble.classList.add('visible'), reduced ? 0 : index * 400));
+    if(thought) setTimeout(() => thought.classList.add('visible'), reduced ? 0 : 800);
+    if(arrow) setTimeout(() => arrow.classList.add('visible'), reduced ? 0 : 1200);
+  }
+
+  if(reduced){
+    reveal();
+    return;
+  }
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) reveal();
+    });
+  }, { threshold:0.35 });
+  io.observe(section);
+}
+
+function initPressureTypes(){
+  const section = document.getElementById('section-types');
+  if(!section) return;
+  const flow = document.getElementById('pressure-types-flow');
+  const detail = document.getElementById('pressure-type-detail');
+  const svgHost = document.getElementById('pressure-type-svg');
+  const title = document.getElementById('pressure-type-title');
+  const text = document.getElementById('pressure-type-text');
+  const example = document.getElementById('pressure-type-example');
+  const buttons = [...section.querySelectorAll('.pressure-type-node')];
+  const reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  const content = {
+    atmospheric: {
+      title: 'Atmospheric Pressure',
+      text: 'The weight of the entire air column above you pressing down.',
+      example: 'Why your ears pop on a plane ✈️',
+      svg: '<svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true"><rect x="0" y="0" width="180" height="180" rx="18" fill="#FFF6E9"></rect><path d="M20 28 C55 12, 125 12, 160 28 L160 55 C124 38, 56 38, 20 55 Z" fill="#cce8ff" opacity=".9"></path><path d="M24 58 C58 42, 122 42, 156 58" stroke="#3E8BFA" stroke-width="3" stroke-dasharray="7 7" fill="none"></path><circle cx="88" cy="113" r="16" fill="#FFD97D"></circle><rect x="81" y="129" width="14" height="18" rx="6" fill="#5c3d2e"></rect><line x1="88" y1="74" x2="88" y2="98" stroke="#FF9F2E" stroke-width="4" marker-end="url(#atmo-arrow)"></line><defs><marker id="atmo-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#FF9F2E"></polygon></marker></defs></svg>'
+    },
+    gauge: {
+      title: 'Gauge Pressure',
+      text: 'Pressure measured above atmospheric pressure.',
+      example: 'Your car tyre shows gauge pressure — add 14.7 psi for absolute 🚗',
+      svg: '<svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true"><rect x="0" y="0" width="180" height="180" rx="18" fill="#FFF6E9"></rect><circle cx="90" cy="96" r="48" fill="#fff" stroke="#E0D0C0" stroke-width="4"></circle><circle cx="90" cy="96" r="34" fill="#F8F0E8" stroke="#E0D0C0" stroke-width="2"></circle><line x1="90" y1="96" x2="124" y2="72" stroke="#FF9F2E" stroke-width="5" stroke-linecap="round"></line><circle cx="90" cy="96" r="6" fill="#A04EF6"></circle><rect x="80" y="35" width="20" height="30" rx="6" fill="#5c3d2e"></rect></svg>'
+    },
+    absolute: {
+      title: 'Absolute Pressure',
+      text: 'Total pressure measured from absolute zero (perfect vacuum).',
+      example: 'Used in Boyle\'s Law calculations 🔬',
+      svg: '<svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true"><rect x="0" y="0" width="180" height="180" rx="18" fill="#FFF6E9"></rect><rect x="42" y="44" width="96" height="92" rx="22" fill="#fff" stroke="#F2E3CC" stroke-width="4"></rect><rect x="62" y="64" width="56" height="52" rx="14" fill="#1a1a2e"></rect><line x1="90" y1="64" x2="90" y2="42" stroke="#FF5A4E" stroke-width="5" marker-end="url(#abs-arrow)"></line><defs><marker id="abs-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#FF5A4E"></polygon></marker></defs></svg>'
+    },
+    differential: {
+      title: 'Differential Pressure',
+      text: 'The difference in pressure between two points.',
+      example: 'How aircraft speed sensors (pitot tubes) work ✈️',
+      svg: '<svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true"><rect x="0" y="0" width="180" height="180" rx="18" fill="#FFF6E9"></rect><rect x="26" y="70" width="44" height="70" rx="12" fill="#cde8ff" stroke="#3E8BFA" stroke-width="3"></rect><rect x="110" y="52" width="44" height="88" rx="12" fill="#e6ffe6" stroke="#58B368" stroke-width="3"></rect><line x1="70" y1="105" x2="110" y2="98" stroke="#FF9F2E" stroke-width="5" marker-end="url(#diff-arrow)"></line><defs><marker id="diff-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#FF9F2E"></polygon></marker></defs></svg>'
+    }
+  };
+
+  function openType(type){
+    const item = content[type];
+    if(!item) return;
+    buttons.forEach(button => button.classList.toggle('active', button.dataset.type === type));
+    if(svgHost) svgHost.innerHTML = item.svg;
+    if(title) title.textContent = item.title;
+    if(text) text.textContent = item.text;
+    if(example) example.textContent = item.example;
+    if(detail){
+      detail.classList.add('open');
+      detail.style.maxHeight = detail.scrollHeight + 'px';
+    }
+  }
+
+  buttons.forEach(button => button.addEventListener('click', () => openType(button.dataset.type)));
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(!entry.isIntersecting) return;
+      if(flow) setTimeout(() => flow.classList.add('flow-drawn'), reduced ? 0 : 180);
+      openType('atmospheric');
+      io.disconnect();
+    });
+  }, { threshold:0.3 });
+
+  if(reduced){
+    if(flow) flow.classList.add('flow-drawn');
+    openType('atmospheric');
+  } else {
+    io.observe(section);
+  }
+
+  window.addEventListener('resize', () => {
+    if(detail && detail.classList.contains('open')) detail.style.maxHeight = detail.scrollHeight + 'px';
+  });
+}
+
+initSectionNav();
+initHookSection();
+initPressureTypes();
+
+/* ══════════════════════════════════
+   CARD 1 · SHARP VS BLUNT
+══════════════════════════════════ */
+let knifeType    = 'sharp';
+let pushInterval = null;
+let pushForce    = 0;
+let hasPlayedEndSound = false;
+
+const KNIFE_CFG = {
+  sharp:{ area:6,  label:'6 mm²'  },
+  blunt:{ area:60, label:'60 mm²' },
+};
+
+function setKnife(type){
+  knifeType = type;
+  if (window.soundFX) window.soundFX.playButtonSound();
+  document.getElementById('knife-sharp').style.display = type==='sharp' ? '' : 'none';
+  document.getElementById('knife-blunt').style.display = type==='blunt' ? '' : 'none';
+  document.getElementById('area-label').textContent = 'Area: '+KNIFE_CFG[type].label;
+  document.getElementById('c1-area').textContent    = KNIFE_CFG[type].area;
+  updateKnife();
+  showInsight('ins1');
+}
+
+function updateKnife(){
+  const cfg = KNIFE_CFG[knifeType];
+  const P   = cfg.area > 0 ? Math.round(pushForce / (cfg.area * 1e-6)) : 0;
+  document.getElementById('c1-force').textContent = Math.round(pushForce);
+  document.getElementById('c1-p').textContent     = P.toLocaleString();
+  drawHeatmap(P, cfg.area);
+
+  if (window.soundFX) {
+    if (pushForce > 0) {
+      window.soundFX.startForceSound();
+      window.soundFX.updateForceSound(pushForce);
+    } else {
+      window.soundFX.stopForceSound();
+    }
+
+    if (pushForce >= 100 && !hasPlayedEndSound) {
+      hasPlayedEndSound = true;
+      if (knifeType === 'sharp') {
+        window.soundFX.playCutSound();
+      } else {
+        window.soundFX.playSquashSound();
+      }
+    }
+  }
+
+  const pct = Math.min(pushForce/100, 1);
+  const ty  = pct * 60;
+  const el  = document.getElementById(knifeType==='sharp' ? 'knife-sharp' : 'knife-blunt');
+  el.setAttribute('transform', `translate(280,${20+ty})`);
+  const dent = document.getElementById('dent');
+  if(knifeType==='sharp'){
+    dent.setAttribute('rx', pct*30);
+    dent.setAttribute('ry', pct*10);
+    dent.setAttribute('cy', 200 - pct*6);
+  } else {
+    dent.setAttribute('rx', pct*55);
+    dent.setAttribute('ry', pct*4);
+    dent.setAttribute('cy', 200 - pct*2);
+  }
+}
+
+function drawHeatmap(P, areaMM){
+  const g    = document.getElementById('heatmap');
+  g.innerHTML = '';
+  const cols  = knifeType==='sharp' ? 3 : 8;
+  const rows  = knifeType==='sharp' ? 2 : 3;
+  const maxP  = knifeType==='sharp' ? 200000 : 20000;
+  const ratio = Math.min(P/maxP, 1);
+  const sx    = 280 - (cols*14)/2;
+  const sy    = 202;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const cx = sx + c*14 + 7;
+      const cy = sy + r*12 + 6;
+      const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      circle.setAttribute('cx', cx);
+      circle.setAttribute('cy', cy);
+      circle.setAttribute('r',  4);
+      const red   = Math.round(88  + ratio*(255-88));
+      const green = Math.round(179 + ratio*(60-179));
+      const blue  = Math.round(104 + ratio*(60-104));
+      circle.setAttribute('fill', `rgb(${red},${green},${blue})`);
+      circle.setAttribute('opacity', 0.7 + ratio*0.3);
+      g.appendChild(circle);
+    }
+  }
+}
+
+function startPush(){
+  if(pushInterval) return;
+  hasPlayedEndSound = false;
+  showInsight('ins1');
+  pushInterval = setInterval(()=>{
+    pushForce = Math.min(pushForce + 3, 100);
+    updateKnife();
+  }, 30);
+}
+function stopPush(){
+  clearInterval(pushInterval);
+  pushInterval = null;
+  const decay = setInterval(()=>{
+    pushForce = Math.max(pushForce - 5, 0);
+    updateKnife();
+    if(pushForce <= 0) clearInterval(decay);
+  }, 30);
+}
+
+drawHeatmap(0, 6);
+
+
+/* ══════════════════════════════════
+   CARD 2 · PASCAL
+══════════════════════════════════ */
+(function(){
+  const slider    = document.getElementById('pascal-slider');
+  const pistonL   = document.getElementById('piston-left');
+  const pistonR   = document.getElementById('piston-right');
+  const fluidL    = document.getElementById('fluid-left');
+  const fluidR    = document.getElementById('fluid-right');
+  const carGroup  = document.getElementById('car-group');
+  const liftArrow = document.getElementById('lift-arrow');
+  const arrowL    = document.getElementById('arrow-left');
+
+  const PL_Y0=192, FL_Y0=200, FL_H0=65;
+  const PR_Y0=192, FR_Y0=200, FR_H0=65;
+
+  function update(){
+    const t    = +slider.value / 100;
+    const Fin  = Math.round(t * 200);
+    const Ain  = 10;   // cm²
+    const Aout = 100;  // cm²
+    const P    = Fin / (Ain * 1e-4);
+    const Fout = P * (Aout * 1e-4);
+
+    const dL = t * 50;
+    pistonL.setAttribute('y', PL_Y0 + dL);
+    fluidL.setAttribute('y', FL_Y0 + dL);
+    fluidL.setAttribute('height', Math.max(FL_H0 - dL, 0));
+
+    const dR = dL * (Ain/Aout);
+    pistonR.setAttribute('y', PR_Y0 - dR);
+    fluidR.setAttribute('y', FR_Y0 - dR);
+    fluidR.setAttribute('height', FR_H0 + dR);
+    carGroup.setAttribute('transform', `translate(0,${-dR * 5})`);
+    liftArrow.setAttribute('opacity', t > 0.05 ? '0.9' : '0');
+    arrowL.setAttribute('stroke-width', 1 + t*4);
+
+    document.getElementById('c2-fin').textContent  = Fin;
+    document.getElementById('c2-p').textContent    = (P/1000).toFixed(1);
+    document.getElementById('c2-fout').textContent = Math.round(Fout);
+
+    if(t > 0) {
+      showInsight('ins2');
+      if (window.soundFX) window.soundFX.playHydraulicSound();
+    }
+  }
+
+  slider.addEventListener('input', update);
+  update();
+})();
+
+
+/* ══════════════════════════════════
+   CARD 3 · DIVER
+══════════════════════════════════ */
+(function(){
+  const slider    = document.getElementById('depth-slider');
+  const depthSpan = document.getElementById('depth-val');
+
+  function update(){
+    const depth = +slider.value;
+    depthSpan.textContent = depth + ' m';
+
+    const diverY = 80 + depth * 5;
+    document.getElementById('diver-group').setAttribute('transform', `translate(280,${diverY})`);
+
+    const P_gauge = 1000 * 10 * depth;
+    const P_kPa   = (P_gauge/1000).toFixed(1);
+    const P_abs   = (101 + P_gauge/1000).toFixed(1);
+    document.getElementById('hydro-p-lbl').textContent     = 'P = '+P_kPa+' kPa';
+    document.getElementById('hydro-depth-lbl').textContent = 'depth = '+depth+' m';
+    document.getElementById('c3-p').textContent   = P_kPa;
+    document.getElementById('c3-abs').textContent = P_abs;
+
+    const cx = 280, cy = diverY;
+    const aLen = 15 + depth * 1.5;
+    document.getElementById('arr-left') .setAttribute('x1', cx-40-aLen);
+    document.getElementById('arr-left') .setAttribute('x2', cx-40);
+    document.getElementById('arr-left') .setAttribute('y1', cy);
+    document.getElementById('arr-left') .setAttribute('y2', cy);
+    document.getElementById('arr-right').setAttribute('x1', cx+40+aLen);
+    document.getElementById('arr-right').setAttribute('x2', cx+40);
+    document.getElementById('arr-right').setAttribute('y1', cy);
+    document.getElementById('arr-right').setAttribute('y2', cy);
+    document.getElementById('arr-top')  .setAttribute('x1', cx);
+    document.getElementById('arr-top')  .setAttribute('x2', cx);
+    document.getElementById('arr-top')  .setAttribute('y1', cy-30-aLen*.6);
+    document.getElementById('arr-top')  .setAttribute('y2', cy-30);
+    document.getElementById('arr-bot')  .setAttribute('x1', cx);
+    document.getElementById('arr-bot')  .setAttribute('x2', cx);
+    document.getElementById('arr-bot')  .setAttribute('y1', cy+30+aLen*.6);
+    document.getElementById('arr-bot')  .setAttribute('y2', cy+30);
+
+    const face = document.getElementById('diver-face');
+    face.textContent = depth<10 ? '😊' : depth<25 ? '😐' : depth<35 ? '😰' : '😱';
+
+    if(depth > 0) {
+      showInsight('ins3');
+      if (window.soundFX) {
+        window.soundFX.playBubbleSound();
+        if (depth >= 30) window.soundFX.playSonarPing();
+      }
+    }
+  }
+
+  slider.addEventListener('input', update);
+  update();
+})();
+
+
+/* ══════════════════════════════════
+   CARD 4 · BOYLE'S LAW
+══════════════════════════════════ */
+(function(){
+  const svg       = document.getElementById('boyle-svg');
+  const piston    = document.getElementById('boyle-piston');
+  const clipRect  = document.getElementById('gas-clip-rect');
+  const gasBg     = document.getElementById('gas-bg');
+  const needle    = document.getElementById('gauge-needle');
+  const gaugeLbl  = document.getElementById('gauge-lbl');
+  const vLbl      = document.getElementById('boyle-v-lbl');
+
+  const WALL_L=88, WALL_R0=370, WALL_T=44, WALL_B=256;
+  let pistonX = WALL_R0;
+  let dragging=false, dragSVG0=0, pistonX0=0;
+
+  // particles
+  const NUM=18;
+  let pts=[];
+
+  function initPts(){
+    pts=[];
+    const g=document.getElementById('particles');
+    g.innerHTML='';
+    const cols=['#FF5A4E','#FF9F2E','#A04EF6','#3E8BFA','#58B368'];
+    for(let i=0;i<NUM;i++){
+      const x  = WALL_L+10+Math.random()*(pistonX-WALL_L-20);
+      const y  = WALL_T+10+Math.random()*(WALL_B-WALL_T-20);
+      const vx = (Math.random()-.5)*3;
+      const vy = (Math.random()-.5)*3;
+      const r  = 5+Math.random()*3;
+      const el = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      el.setAttribute('r',    r);
+      el.setAttribute('fill', cols[i%cols.length]);
+      el.setAttribute('opacity','.85');
+      g.appendChild(el);
+      pts.push({x,y,vx,vy,r,el});
+    }
+  }
+
+  function svgX(clientX){
+    const pt=svg.createSVGPoint();
+    pt.x=clientX; pt.y=0;
+    return pt.matrixTransform(svg.getScreenCTM().inverse()).x;
+  }
+
+  function stepPts(){
+    const speed=1+(WALL_R0-pistonX)/100*2.5;
+    for(const p of pts){
+      p.x+=p.vx*speed; p.y+=p.vy*speed;
+      if(p.x-p.r<WALL_L)   { p.x=WALL_L+p.r;    p.vx= Math.abs(p.vx); }
+      if(p.x+p.r>pistonX)  { p.x=pistonX-p.r;   p.vx=-Math.abs(p.vx); }
+      if(p.y-p.r<WALL_T)   { p.y=WALL_T+p.r;    p.vy= Math.abs(p.vy); }
+      if(p.y+p.r>WALL_B)   { p.y=WALL_B-p.r;    p.vy=-Math.abs(p.vy); }
+      p.el.setAttribute('cx',p.x);
+      p.el.setAttribute('cy',p.y);
+    }
+  }
+
+  function updateGauge(){
+    const V0    = WALL_R0-WALL_L;
+    const V     = Math.max(pistonX-WALL_L, 10);
+    const ratio = V0/V;
+    const angle = -90 + Math.min((ratio-1)/3,1)*180;
+    needle.setAttribute('transform',`rotate(${angle})`);
+    gaugeLbl.textContent = ratio.toFixed(2)+'×P₀';
+    const Vpct = Math.round(V/V0*100);
+    vLbl.textContent='V = '+Vpct+'%';
+    document.getElementById('c4-v').textContent=Vpct;
+    document.getElementById('c4-p').textContent=ratio.toFixed(2);
+    const r2=Math.min((ratio-1)/2,1);
+    gasBg.setAttribute('fill',`rgb(255,${Math.round(240-r2*60)},${Math.round(220-r2*60)})`);
+  }
+
+  function getClientX(e){ return e.touches ? e.touches[0].clientX : e.clientX; }
+
+  piston.addEventListener('pointerdown',e=>{
+    dragging=true; dragSVG0=svgX(getClientX(e)); pistonX0=pistonX;
+    piston.setPointerCapture(e.pointerId);
+    showInsight('ins4');
+    if (window.soundFX) window.soundFX.playHissSound();
+  });
+  window.addEventListener('pointermove',e=>{
+    if(!dragging) return;
+    const dx=svgX(getClientX(e))-dragSVG0;
+    pistonX=Math.max(WALL_L+40,Math.min(WALL_R0,pistonX0+dx));
+    piston.setAttribute('x', pistonX-8);
+    clipRect.setAttribute('width', pistonX-WALL_L+2);
+    gasBg.setAttribute('width',    pistonX-WALL_L);
+    updateGauge();
+
+    if (window.soundFX) {
+      const V0    = WALL_R0-WALL_L;
+      const V     = Math.max(pistonX-WALL_L, 10);
+      const ratio = V0/V;
+      window.soundFX.updateHissSound(ratio);
+    }
+  });
+  window.addEventListener('pointerup',()=>{
+    if (dragging) {
+      dragging=false;
+      if (window.soundFX) window.soundFX.stopHissSound();
+    }
+  });
+
+  initPts();
+  updateGauge();
+
+  function loop(){ stepPts(); requestAnimationFrame(loop); }
+  loop();
+})();
+
+
+/* ══════════════════════════════════
+   CARD 5 · BLOOD PRESSURE
+══════════════════════════════════ */
+let heartAnimI = null;
+let card5Used  = false;
+let lastHeartbeatTime = 0;
+
+function triggerHeartbeat(){
+  card5Used = true;
+  showInsight('ins5');
+  updateBP();
+
+  const stress = +document.getElementById('stress-slider').value;
+  if (window.soundFX) window.soundFX.playHeartbeatSound(stress);
+
+  // heart pulse
+  clearInterval(heartAnimI);
+  const hg = document.getElementById('heart-group');
+  let t = 0;
+  heartAnimI = setInterval(()=>{
+    t += 0.15;
+    const s = 1 + Math.sin(t) * 0.12 * Math.exp(-t*0.4);
+    hg.setAttribute('transform', `translate(110,130) scale(${s})`);
+    if(t > 4){ clearInterval(heartAnimI); hg.setAttribute('transform','translate(110,130)'); }
+  }, 16);
+
+  // pulse wave
+  const wave  = document.getElementById('pulse-wave');
+  const lumen = document.getElementById('artery-lumen');
+  wave.setAttribute('d','M205,115 Q280,95 350,125 Q420,150 495,125');
+  lumen.setAttribute('height','44');
+  setTimeout(()=>{
+    wave.setAttribute('d','M205,125 Q280,125 350,125 Q420,125 495,125');
+    lumen.setAttribute('height','34');
+  }, 400);
+}
+
+function updateBP(){
+  const stress = +document.getElementById('stress-slider').value;
+  const sys = Math.round(120 + stress * 0.6);
+  const dia = Math.round(80  + stress * 0.3);
+  document.getElementById('c5-sys').textContent  = sys;
+  document.getElementById('c5-dia').textContent  = dia;
+  document.getElementById('sys-val').textContent = sys;
+  const lbl = stress<30 ? 'Normal' : stress<60 ? 'Elevated' : 'High!';
+  const col = stress<30 ? '#58B368' : stress<60 ? '#FF9F2E' : '#FF5A4E';
+  const stressEl = document.getElementById('bp-stress-lbl');
+  stressEl.textContent = 'Stress: '+lbl;
+  stressEl.setAttribute('fill', col);
+  if(card5Used) showInsight('ins5');
+  // ECG speed syncs with heart rate: 70 bpm at rest → 150 bpm at full stress
+  const heartRate = 70 + stress * 0.8;
+  const ecg = document.getElementById('ecg-path');
+  if(ecg) ecg.style.animationDuration = (60/heartRate).toFixed(2)+'s';
+}
+
+document.getElementById('heart-group').addEventListener('click', triggerHeartbeat);
+document.getElementById('stress-slider').addEventListener('input', ()=>{
+  card5Used = true;
+  showInsight('ins5');
+  updateBP();
+  
+  const now = performance.now();
+  if (now - lastHeartbeatTime > 400) {
+    lastHeartbeatTime = now;
+    triggerHeartbeat();
+  }
+});
+
+
+/* ══════════════════════════════════
+   CARD 6 · ROCKET LAUNCH
+══════════════════════════════════ */
+let rocketLaunched = false;
+let rocketRAF = null;
+
+function igniteRocket(){
+  if(rocketLaunched) return;
+  rocketLaunched = true;
+  document.getElementById('btn-ignite').style.display = 'none';
+  document.getElementById('btn-rocket-reset').style.display = '';
+  showInsight('ins6');
+
+  if (window.soundFX) window.soundFX.playRocketSound();
+
+  const card6     = document.getElementById('card6');
+  const flames    = document.getElementById('rocket-flames');
+  const rocketGrp = document.getElementById('rocket-group');
+  const arms      = document.getElementById('launch-arms');
+  const tFill     = document.getElementById('thrust-gauge-fill');
+  const tPct      = document.getElementById('thrust-pct-lbl');
+  const tDisp     = document.getElementById('c6-thrust');
+  const badge     = document.getElementById('liftoff-badge');
+
+  card6.classList.add('card-shake');
+  card6.addEventListener('animationend', ()=>card6.classList.remove('card-shake'), {once:true});
+
+  flames.setAttribute('opacity','1');
+  flames.classList.add('flame-active');
+  arms.setAttribute('opacity','0');
+
+  const ROCKET_Y0 = 215, FLAME_Y0 = 270, LIFT = 205, MAX_T = 35000, DUR = 240;
+  let frame = 0;
+
+  function launch(){
+    frame++;
+    const raw   = Math.min(1, frame/DUR);
+    const eased = raw < 0.5 ? 2*raw*raw : -1+(4-2*raw)*raw;
+
+    rocketGrp.setAttribute('transform', `translate(280,${ROCKET_Y0 - eased*LIFT})`);
+    flames.setAttribute('transform',    `translate(280,${FLAME_Y0  - eased*LIFT})`);
+
+    const gaugeH = Math.round(eased*148);
+    tFill.setAttribute('height', gaugeH);
+    tFill.setAttribute('y',      171 - gaugeH);
+    const r=Math.round(88 +eased*(255-88)), g=Math.round(179+eased*(90-179)), b=Math.round(104+eased*(60-104));
+    const col=`rgb(${r},${g},${b})`;
+    tFill.setAttribute('fill', col);
+    tPct.textContent = Math.round(eased*100)+'%';
+    tPct.setAttribute('fill', col);
+    tDisp.textContent = Math.round(eased*MAX_T).toLocaleString();
+
+    if (window.soundFX) window.soundFX.updateRocketSound(eased);
+
+    if(frame%3===0) spawnSmoke(280, FLAME_Y0 - eased*LIFT + 12, eased);
+    if(raw>=0.75) badge.setAttribute('opacity', Math.min(1,(raw-0.75)/0.25).toFixed(2));
+    
+    if (raw < 1) {
+      rocketRAF = requestAnimationFrame(launch);
+    } else {
+      if (window.soundFX) window.soundFX.stopRocketSound();
+    }
+  }
+  rocketRAF = requestAnimationFrame(launch);
+}
+
+function spawnSmoke(cx, cy, intensity){
+  const g = document.getElementById('rocket-smoke');
+  const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  const sz = 3 + Math.random()*7;
+  c.setAttribute('cx', cx+(Math.random()-.5)*22);
+  c.setAttribute('cy', cy);
+  c.setAttribute('r',  sz);
+  const grey=Math.round(80+Math.random()*100);
+  c.setAttribute('fill',    `rgb(${grey},${grey},${grey})`);
+  c.setAttribute('opacity', '0.5');
+  g.appendChild(c);
+  let ox=parseFloat(c.getAttribute('cx')), oy=cy;
+  let vx=(Math.random()-.5)*1.8, vy=-0.8-Math.random()*1.2, op=0.5, r=sz;
+  (function drift(){
+    ox+=vx; oy+=vy; op-=0.012; r+=0.18;
+    c.setAttribute('cx',ox); c.setAttribute('cy',oy);
+    c.setAttribute('opacity', Math.max(0,op).toFixed(3));
+    c.setAttribute('r',r);
+    if(op>0) requestAnimationFrame(drift); else c.remove();
+  })();
+}
+
+function resetRocket(){
+  rocketLaunched=false;
+  cancelAnimationFrame(rocketRAF);
+  if (window.soundFX) {
+    window.soundFX.stopRocketSound();
+    window.soundFX.tone({ frequency: 200, slideTo: 40, duration: 0.3, type: 'sine', gain: 0.035 });
+  }
+  document.getElementById('btn-ignite').style.display='';
+  document.getElementById('btn-rocket-reset').style.display='none';
+  const flames=document.getElementById('rocket-flames');
+  flames.setAttribute('opacity','0');
+  flames.classList.remove('flame-active');
+  flames.setAttribute('transform','translate(280,270)');
+  document.getElementById('rocket-group').setAttribute('transform','translate(280,215)');
+  document.getElementById('launch-arms').setAttribute('opacity','1');
+  const tFill=document.getElementById('thrust-gauge-fill');
+  tFill.setAttribute('height','0'); tFill.setAttribute('y','171'); tFill.setAttribute('fill','#58B368');
+  const tPct=document.getElementById('thrust-pct-lbl');
+  tPct.textContent='0%'; tPct.setAttribute('fill','#58B368');
+  document.getElementById('c6-thrust').textContent='0';
+  document.getElementById('liftoff-badge').setAttribute('opacity','0');
+  document.getElementById('rocket-smoke').innerHTML='';
+  const ins=document.getElementById('ins6');
+  if(ins) ins.classList.remove('visible');
+}
+
+
+/* ══════════════════════════════════
+   SCROLL ANIMATIONS
+══════════════════════════════════ */
+(function(){
+  /* 1 — fixed pressure gauge */
+  const sgFill = document.getElementById('sg-fill');
+  const sgVal  = document.getElementById('sg-val');
+  const STEPS  = [
+    {t:0.00, label:'0 Pa',        color:'#58B368'},
+    {t:0.20, label:'1,000 Pa',    color:'#58B368'},
+    {t:0.45, label:'10,000 Pa',   color:'#FF9F2E'},
+    {t:0.70, label:'100,000 Pa',  color:'#FF5A4E'},
+    {t:0.90, label:'CRITICAL 💥', color:'#FF5A4E'},
+  ];
+
+  const scrollProg = document.getElementById('scroll-progress');
+  function updateGauge(){
+    const max = document.body.scrollHeight - window.innerHeight;
+    const t   = max>0 ? Math.min(1, window.scrollY/max) : 0;
+    sgFill.style.height = (t*100)+'%';
+    const r=Math.round(88+t*(255-88)), g=Math.round(179+t*(80-179)), b=Math.round(104+t*(50-104));
+    sgFill.style.background = `rgb(${r},${g},${b})`;
+    const step = STEPS.reduce((best,s)=> s.t<=t ? s : best, STEPS[0]);
+    sgVal.textContent = step.label;
+    sgVal.style.color  = step.color;
+    sgFill.classList.toggle('glow', t>=0.88);
+    // scroll progress bar
+    if(scrollProg){
+      const pct = t*100;
+      scrollProg.style.width = pct+'%';
+      scrollProg.style.background = pct<40 ? '#58B368' : pct<72 ? '#FF9F2E' : '#FF5A4E';
+    }
+  }
+  window.addEventListener('scroll', updateGauge, {passive:true});
+  updateGauge();
+
+  /* 2 — card entrance: slam in from alternating sides */
+  const BURST_COLORS=['#FF5A4E','#58B368','#FF9F2E','#3E8BFA','#A04EF6'];
+  const cards=[...document.querySelectorAll('.card')];
+  cards.forEach((card,i)=>{
+    card.style.opacity   = '0';
+    card.style.transform = i%2===0 ? 'translateX(-80px)' : 'translateX(80px)';
+    card.style.transition= 'opacity .65s cubic-bezier(.34,1.4,.64,1),transform .65s cubic-bezier(.34,1.4,.64,1)';
+  });
+
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting) return;
+      const card=entry.target;
+      requestAnimationFrame(()=>{
+        card.style.opacity='1';
+        card.style.transform='none';
+        // clear inline styles after transition so CSS :hover transform takes over
+        function cleanup(e){
+          if(e.propertyName!=='transform') return;
+          card.style.transition='';
+          card.style.opacity='';
+          card.style.transform='';
+          card.removeEventListener('transitionend',cleanup);
+        }
+        card.addEventListener('transitionend',cleanup);
+      });
+      cardBurst(card);
+      startCounters(card);
+      io.unobserve(card);
+    });
+  },{threshold:0.12});
+  cards.forEach(c=>io.observe(c));
+
+  /* 3 — particle burst */
+  function cardBurst(card){
+    const rect=card.getBoundingClientRect();
+    const cx=rect.left+rect.width/2, cy=rect.top+rect.height/4;
+    for(let i=0;i<10;i++){
+      const el=document.createElement('div');
+      el.style.cssText=`position:fixed;width:7px;height:7px;border-radius:50%;
+        pointer-events:none;z-index:999;background:${BURST_COLORS[i%BURST_COLORS.length]};`;
+      document.body.appendChild(el);
+      const ang=(i/10)*Math.PI*2+Math.random()*.6, sp=4+Math.random()*5;
+      let x=cx, y=cy, vx=Math.cos(ang)*sp, vy=Math.sin(ang)*sp-3, t=0;
+      (function anim(){
+        t++; x+=vx; vy+=0.32; y+=vy;
+        el.style.left=x+'px'; el.style.top=y+'px';
+        el.style.opacity=Math.max(0,1-t/38);
+        if(t<38) requestAnimationFrame(anim); else el.remove();
+      })();
+    }
+  }
+
+  /* 4 — number counters */
+  function startCounters(card){
+    card.querySelectorAll('.chip [id]').forEach(el=>{
+      const n=parseInt(el.textContent,10);
+      if(!isNaN(n) && n>1 && String(n)===el.textContent.trim()){
+        let f=0; const dur=38;
+        (function count(){
+          f++;
+          el.textContent=Math.round(Math.min(1,f/dur)*n);
+          if(f<dur) requestAnimationFrame(count);
+        })();
+      }
+    });
+  }
+})();
+
+/* ══════════════════════════════════
+   DECORATIVE JS
+══════════════════════════════════ */
+(function(){
+  // 1 — floating physics symbols
+  const SYMS=['⚡','🔬','⚗️','💧','🌊','🔵','⚡','🔬','⚗️','💧','🌊','🔵'];
+  if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+    SYMS.forEach(sym=>{
+      const el=document.createElement('span');
+      el.className='float-sym';
+      el.textContent=sym;
+      const size=20+Math.random()*20;
+      el.style.cssText=`font-size:${size}px;left:${Math.random()*95}%;`+
+        `--dur:${10+Math.random()*10}s;--delay:-${Math.random()*14}s;`+
+        `--drift:${(Math.random()-.5)*80}px`;
+      document.body.appendChild(el);
+    });
+  }
+
+  // 2 — typewriter subtitle
+  const typeTarget='Start with curiosity, then test pressure in every form.';
+  const typeEl=document.getElementById('subtitle-type');
+  if(typeEl){
+    if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+      typeEl.textContent=typeTarget;
+    } else {
+      let i=0;
+      (function type(){
+        typeEl.textContent=typeTarget.slice(0,i);
+        if(i<typeTarget.length){i++;setTimeout(type,38);}
+      })();
+    }
+  }
+
+  // 3 — stat badge count-up pop
+  const badges=document.querySelectorAll('.stat-badge');
+  badges.forEach((b,i)=>setTimeout(()=>b.classList.add('pop'),900+i*200));
+
+  // 4 — section number watermarks
+  document.querySelectorAll('.card').forEach((card,i)=>{
+    const num=document.createElement('div');
+    num.className='card-num';
+    num.textContent=String(i+1).padStart(2,'0');
+    card.appendChild(num);
+  });
+})();
+
+/* ══════════════════════════════════
+   CUSTOM CURSOR — ENHANCED
+══════════════════════════════════ */
+(function(){
+  if(window.matchMedia('(pointer:coarse)').matches) return;
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+
+  document.body.classList.add('custom-cursor-active');
+
+  const dot   = document.getElementById('cursor-dot');
+  const ring  = document.getElementById('cursor-ring');
+  const ring2 = document.getElementById('cursor-ring2');
+  const lbl   = document.getElementById('cursor-label');
+
+  // Ghost trail — 8 dots, comet style: large+glowing at head, tiny+dim at tail
+  const GHOST_N  = 8;
+  const G_COLORS = ['#FF5A4E','#FF9F2E','#A04EF6','#3E8BFA','#58B368','#FF5A4E','#A04EF6','#3E8BFA'];
+  const ghosts = Array.from({length:GHOST_N}, (_,i)=>{
+    const g = document.createElement('div');
+    g.className = 'cursor-ghost';
+    const sz = Math.max(2, 9 - i);
+    g.style.cssText = `width:${sz}px;height:${sz}px;`+
+      `background:${G_COLORS[i]};`+
+      `box-shadow:0 0 ${6-i}px ${G_COLORS[i]};`;
+    document.body.appendChild(g);
+    return g;
+  });
+
+  let mx=-200, my=-200;
+  // Spring state: two rings with independent physics
+  let r1x=-200,r1y=-200,r1vx=0,r1vy=0;  // ring1 — faster spring
+  let r2x=-200,r2y=-200,r2vx=0,r2vy=0;  // ring2 — slower, bouncier
+  const hist=[];
+
+  document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; }, {passive:true});
+  document.addEventListener('mouseleave', ()=>{ mx=-200; my=-200; });
+
+  // Cursor state — priority: btn > slider > nav > card
+  let curState='default';
+  function setState(type){
+    if(type===curState) return;
+    curState=type;
+    ring.classList.remove('on-btn','on-slider','on-card','on-nav');
+    ring2.classList.remove('on-btn','on-slider','on-card','on-nav');
+    dot.classList.remove('on-btn');
+    lbl.textContent='';
+    if(type==='btn')   { ring.classList.add('on-btn');    ring2.classList.add('on-btn');    dot.classList.add('on-btn'); lbl.textContent='✋'; }
+    if(type==='slider'){ ring.classList.add('on-slider'); ring2.classList.add('on-slider'); lbl.textContent='↔'; }
+    if(type==='card')  { ring.classList.add('on-card');   ring2.classList.add('on-card'); }
+    if(type==='nav')   { ring.classList.add('on-nav');    ring2.classList.add('on-nav'); }
+  }
+
+  document.addEventListener('mouseover', e=>{
+    const b=e.target.closest('button');
+    const s=e.target.closest('input[type=range]');
+    const n=e.target.closest('.nav-tab');
+    const c=e.target.closest('.card');
+    if(b)      setState('btn');
+    else if(s) setState('slider');
+    else if(n) setState('nav');
+    else if(c) setState('card');
+    else       setState('default');
+  });
+
+  // Click: ring1 burst + 3 expanding ripple rings
+  document.addEventListener('mousedown', ()=>{
+    ring.classList.add('clicking');
+    setTimeout(()=>ring.classList.remove('clicking'), 440);
+    ['#FF5A4E','#A04EF6','#FF9F2E'].forEach((col,i)=>{
+      setTimeout(()=>{
+        const r=document.createElement('div');
+        r.style.cssText=`position:fixed;border-radius:50%;pointer-events:none;z-index:99990;`+
+          `left:${mx}px;top:${my}px;width:18px;height:18px;`+
+          `border:2.5px solid ${col};box-shadow:0 0 8px ${col},inset 0 0 4px ${col};`+
+          `animation:rippleClick ${0.5+i*.12}s ease-out forwards;`;
+        document.body.appendChild(r);
+        setTimeout(()=>r.remove(), 700);
+      }, i*70);
+    });
+  });
+
+  // rAF — spring physics, instant dot, comet trail
+  (function tick(){
+    requestAnimationFrame(tick);
+
+    hist.unshift({x:mx, y:my});
+    if(hist.length > GHOST_N*6+2) hist.length = GHOST_N*6+2;
+
+    // Dot: instant
+    dot.style.left = mx+'px';
+    dot.style.top  = my+'px';
+
+    // Ring1: k=0.14, damp=0.72 — medium spring
+    r1vx=(r1vx+(mx-r1x)*.14)*.72; r1vy=(r1vy+(my-r1y)*.14)*.72;
+    r1x+=r1vx; r1y+=r1vy;
+    ring.style.left=r1x+'px'; ring.style.top=r1y+'px';
+
+    // Ring2: k=0.065, damp=0.62 — slow elastic spring
+    r2vx=(r2vx+(mx-r2x)*.065)*.62; r2vy=(r2vy+(my-r2y)*.065)*.62;
+    r2x+=r2vx; r2y+=r2vy;
+    ring2.style.left=r2x+'px'; ring2.style.top=r2y+'px';
+
+    // Label tracks dot with slight offset
+    lbl.style.left=(mx+16)+'px'; lbl.style.top=(my-7)+'px';
+
+    // Comet ghost trail
+    ghosts.forEach((g,i)=>{
+      const p=hist[Math.min((i+1)*5, hist.length-1)];
+      if(!p) return;
+      g.style.left   =p.x+'px';
+      g.style.top    =p.y+'px';
+      g.style.opacity=(0.65*(1-i/GHOST_N)).toFixed(2);
+    });
+  })();
+})();
+
+/* ══════════════════════════════════
+   QUIZ + SOUND FX (LIVE PAGE)
+══════════════════════════════════ */
+(function(){
+  let audioCtx = null;
+  let lastSliderSound = 0;
+  let forceOsc = null;
+  let forceGain = null;
+  let hydraulicOsc1 = null;
+  let hydraulicOsc2 = null;
+  let hydraulicGain = null;
+  let hydraulicTimeout = null;
+  let lastBubbleTime = 0;
+  let lastSonarTime = 0;
+  let hissSource = null;
+  let hissFilter = null;
+  let hissGain = null;
+  let rocketOsc = null;
+  let rocketNoise = null;
+  let rocketFilter = null;
+  let rocketGain = null;
+
+  function getAudioContext() {
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    if (!Ctor) return null;
+    if (!audioCtx) audioCtx = new Ctor();
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    return audioCtx;
+  }
+
+  function unlockAudio() {
+    const ctx = getAudioContext();
+    if (!ctx || ctx.state === 'running') return;
+    ctx.resume().catch(() => {});
+  }
+
+  function tone({ frequency = 440, duration = 0.07, type = 'sine', gain = 0.03, slideTo = null } = {}) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const amp = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+    if (slideTo !== null) {
+      osc.frequency.exponentialRampToValueAtTime(Math.max(40, slideTo), ctx.currentTime + duration);
+    }
+    amp.gain.setValueAtTime(0.0001, ctx.currentTime);
+    amp.gain.exponentialRampToValueAtTime(gain, ctx.currentTime + 0.01);
+    amp.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+    osc.connect(amp);
+    amp.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration + 0.03);
+  }
+
+  function playButtonSound() {
+    tone({ frequency: 520, slideTo: 390, duration: 0.08, type: 'triangle', gain: 0.026 });
+  }
+
+  function playSliderSound(value, min, max) {
+    const now = performance.now();
+    if (now - lastSliderSound < 35) return;
+    lastSliderSound = now;
+    const ratio = (value - min) / Math.max(1, (max - min));
+    const frequency = 240 + ratio * 420;
+    tone({ frequency, slideTo: frequency * 1.1, duration: 0.05, type: 'sine', gain: 0.018 });
+  }
+
+  function playCorrectSound() {
+    tone({ frequency: 660, slideTo: 880, duration: 0.08, type: 'triangle', gain: 0.03 });
+    setTimeout(() => tone({ frequency: 990, slideTo: 1320, duration: 0.06, type: 'triangle', gain: 0.02 }), 70);
+  }
+
+  function playWrongSound() {
+    tone({ frequency: 220, slideTo: 150, duration: 0.12, type: 'sawtooth', gain: 0.018 });
+  }
+
+  function playNoise({ duration = 0.15, gain = 0.05, filterStart = 2000, filterEnd = 100 } = {}) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const bufferSize = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(filterStart, ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(Math.max(10, filterEnd), ctx.currentTime + duration);
+
+    const amp = ctx.createGain();
+    amp.gain.setValueAtTime(0.0001, ctx.currentTime);
+    amp.gain.exponentialRampToValueAtTime(gain, ctx.currentTime + 0.01);
+    amp.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+    noise.connect(filter);
+    filter.connect(amp);
+    amp.connect(ctx.destination);
+    noise.start();
+    noise.stop(ctx.currentTime + duration + 0.03);
+  }
+
+  function playCutSound() {
+    playNoise({ duration: 0.16, gain: 0.06, filterStart: 2500, filterEnd: 150 });
+  }
+
+  function playSquashSound() {
+    playNoise({ duration: 0.28, gain: 0.07, filterStart: 450, filterEnd: 30 });
+    tone({ frequency: 130, slideTo: 40, duration: 0.22, type: 'sawtooth', gain: 0.04 });
+  }
+
+  function startForceSound() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (forceOsc) return;
+
+    forceOsc = ctx.createOscillator();
+    forceGain = ctx.createGain();
+    
+    forceOsc.type = 'triangle';
+    forceOsc.frequency.setValueAtTime(100, ctx.currentTime);
+    
+    forceGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(300, ctx.currentTime);
+
+    forceOsc.connect(filter);
+    filter.connect(forceGain);
+    forceGain.connect(ctx.destination);
+    
+    forceOsc.start();
+  }
+
+  function updateForceSound(f) {
+    if (!forceOsc || !forceGain) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    
+    const pitch = 100 + (f / 100) * 100;
+    const volume = (f / 100) * 0.035;
+    
+    forceOsc.frequency.setTargetAtTime(pitch, ctx.currentTime, 0.05);
+    forceGain.gain.setTargetAtTime(volume, ctx.currentTime, 0.05);
+  }
+
+  function stopForceSound() {
+    if (!forceOsc || !forceGain) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    
+    const currOsc = forceOsc;
+    const currGain = forceGain;
+    
+    forceOsc = null;
+    forceGain = null;
+    
+    currGain.gain.cancelScheduledValues(ctx.currentTime);
+    currGain.gain.setValueAtTime(currGain.gain.value, ctx.currentTime);
+    currGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+    
+    setTimeout(() => {
+      try {
+        currOsc.stop();
+        currOsc.disconnect();
+        currGain.disconnect();
+      } catch (err) {}
+    }, 120);
+  }
+
+  function playHydraulicSound() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    
+    if (hydraulicTimeout) {
+      clearTimeout(hydraulicTimeout);
+      hydraulicTimeout = null;
+    }
+
+    if (!hydraulicOsc1) {
+      hydraulicOsc1 = ctx.createOscillator();
+      hydraulicOsc2 = ctx.createOscillator();
+      hydraulicGain = ctx.createGain();
+
+      hydraulicOsc1.type = 'triangle';
+      hydraulicOsc1.frequency.setValueAtTime(85, ctx.currentTime);
+
+      hydraulicOsc2.type = 'sine';
+      hydraulicOsc2.frequency.setValueAtTime(170, ctx.currentTime);
+
+      hydraulicGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      hydraulicGain.gain.linearRampToValueAtTime(0.018, ctx.currentTime + 0.05);
+
+      hydraulicOsc1.connect(hydraulicGain);
+      hydraulicOsc2.connect(hydraulicGain);
+      hydraulicGain.connect(ctx.destination);
+
+      hydraulicOsc1.start();
+      hydraulicOsc2.start();
+    }
+
+    hydraulicTimeout = setTimeout(() => {
+      stopHydraulicSound();
+    }, 120);
+  }
+
+  function stopHydraulicSound() {
+    if (!hydraulicOsc1 || !hydraulicGain) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const o1 = hydraulicOsc1;
+    const o2 = hydraulicOsc2;
+    const g = hydraulicGain;
+
+    hydraulicOsc1 = null;
+    hydraulicOsc2 = null;
+    hydraulicGain = null;
+
+    g.gain.cancelScheduledValues(ctx.currentTime);
+    g.gain.setValueAtTime(g.gain.value, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.1);
+
+    setTimeout(() => {
+      try {
+        o1.stop(); o1.disconnect();
+        o2.stop(); o2.disconnect();
+        g.disconnect();
+      } catch(e){}
+    }, 150);
+  }
+
+  function playBubbleSound() {
+    const now = performance.now();
+    if (now - lastBubbleTime < 180) return;
+    lastBubbleTime = now;
+    
+    const startF = 800 + Math.random() * 300;
+    tone({
+      frequency: startF,
+      slideTo: startF * 1.6,
+      duration: 0.06,
+      type: 'sine',
+      gain: 0.012
+    });
+  }
+
+  function playSonarPing() {
+    const now = performance.now();
+    if (now - lastSonarTime < 2200) return;
+    lastSonarTime = now;
+    
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    
+    tone({
+      frequency: 1200,
+      slideTo: 1200,
+      duration: 1.2,
+      type: 'sine',
+      gain: 0.025
+    });
+    
+    setTimeout(() => {
+      tone({
+        frequency: 1200,
+        slideTo: 1200,
+        duration: 0.8,
+        type: 'sine',
+        gain: 0.007
+      });
+    }, 350);
+  }
+
+  function playHissSound() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (hissSource) return;
+
+    const bufferSize = ctx.sampleRate * 2.0;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    hissSource = ctx.createBufferSource();
+    hissSource.buffer = buffer;
+    hissSource.loop = true;
+
+    hissFilter = ctx.createBiquadFilter();
+    hissFilter.type = 'bandpass';
+    hissFilter.Q.setValueAtTime(3.0, ctx.currentTime);
+    hissFilter.frequency.setValueAtTime(600, ctx.currentTime);
+
+    hissGain = ctx.createGain();
+    hissGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    hissGain.gain.linearRampToValueAtTime(0.015, ctx.currentTime + 0.05);
+
+    hissSource.connect(hissFilter);
+    hissFilter.connect(hissGain);
+    hissGain.connect(ctx.destination);
+
+    hissSource.start();
+  }
+
+  function updateHissSound(compressionRatio) {
+    if (!hissFilter || !hissGain) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const freq = 600 + (compressionRatio - 1) * 500;
+    const vol = 0.012 + (compressionRatio - 1) * 0.008;
+
+    hissFilter.frequency.setTargetAtTime(freq, ctx.currentTime, 0.05);
+    hissGain.gain.setTargetAtTime(vol, ctx.currentTime, 0.05);
+  }
+
+  function stopHissSound() {
+    if (!hissSource || !hissGain) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const s = hissSource;
+    const g = hissGain;
+
+    hissSource = null;
+    hissFilter = null;
+    hissGain = null;
+
+    g.gain.cancelScheduledValues(ctx.currentTime);
+    g.gain.setValueAtTime(g.gain.value, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+
+    setTimeout(() => {
+      try {
+        s.stop();
+        s.disconnect();
+        g.disconnect();
+      } catch(e){}
+    }, 100);
+  }
+
+  function playHeartbeatSound(stress) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const vol = 0.05 + (stress / 100) * 0.05;
+
+    tone({
+      frequency: 58,
+      duration: 0.08,
+      type: 'sine',
+      gain: vol
+    });
+
+    setTimeout(() => {
+      tone({
+        frequency: 48,
+        duration: 0.1,
+        type: 'sine',
+        gain: vol * 0.8
+      });
+    }, 140);
+  }
+
+  function playRocketSound() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (rocketOsc) return;
+
+    rocketOsc = ctx.createOscillator();
+    rocketOsc.type = 'sawtooth';
+    rocketOsc.frequency.setValueAtTime(35, ctx.currentTime);
+
+    const bufferSize = ctx.sampleRate * 2.0;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    rocketNoise = ctx.createBufferSource();
+    rocketNoise.buffer = buffer;
+    rocketNoise.loop = true;
+
+    rocketFilter = ctx.createBiquadFilter();
+    rocketFilter.type = 'lowpass';
+    rocketFilter.frequency.setValueAtTime(80, ctx.currentTime);
+
+    rocketGain = ctx.createGain();
+    rocketGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    rocketGain.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 0.15);
+
+    rocketOsc.connect(rocketFilter);
+    rocketNoise.connect(rocketFilter);
+    rocketFilter.connect(rocketGain);
+    rocketGain.connect(ctx.destination);
+
+    rocketOsc.start();
+    rocketNoise.start();
+  }
+
+  function updateRocketSound(progress) {
+    if (!rocketOsc || !rocketFilter || !rocketGain) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const oscFreq = 35 + progress * 55;
+    const filterCutoff = 80 + progress * 240;
+    const vol = 0.03 + progress * 0.08;
+
+    rocketOsc.frequency.setTargetAtTime(oscFreq, ctx.currentTime, 0.05);
+    rocketFilter.frequency.setTargetAtTime(filterCutoff, ctx.currentTime, 0.05);
+    rocketGain.gain.setTargetAtTime(vol, ctx.currentTime, 0.05);
+  }
+
+  function stopRocketSound() {
+    if (!rocketOsc || !rocketGain) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const osc = rocketOsc;
+    const noise = rocketNoise;
+    const g = rocketGain;
+
+    rocketOsc = null;
+    rocketNoise = null;
+    rocketFilter = null;
+    rocketGain = null;
+
+    g.gain.cancelScheduledValues(ctx.currentTime);
+    g.gain.setValueAtTime(g.gain.value, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.6);
+
+    setTimeout(() => {
+      try {
+        osc.stop(); osc.disconnect();
+        noise.stop(); noise.disconnect();
+        g.disconnect();
+      } catch(e){}
+    }, 700);
+  }
+
+  // Expose system globally for other modules in the page
+  window.soundFX = {
+    tone,
+    playButtonSound,
+    playCorrectSound,
+    playWrongSound,
+    playNoise,
+    playCutSound,
+    playSquashSound,
+    startForceSound,
+    updateForceSound,
+    stopForceSound,
+    playHydraulicSound,
+    stopHydraulicSound,
+    playBubbleSound,
+    playSonarPing,
+    playHissSound,
+    updateHissSound,
+    stopHissSound,
+    playHeartbeatSound,
+    playRocketSound,
+    updateRocketSound,
+    stopRocketSound
+  };
+
+  document.addEventListener('pointerdown', event => {
+    const button = event.target.closest('button');
+    if (button) playButtonSound();
+  }, { passive: true, capture: true });
+
+  document.addEventListener('pointerdown', unlockAudio, { passive: true, capture: true, once: true });
+  document.addEventListener('keydown', unlockAudio, { passive: true, capture: true, once: true });
+
+  document.addEventListener('input', event => {
+    const slider = event.target.closest('input[type=range]');
+    if (!slider) return;
+    // Exclude special sliders
+    if (slider.id === 'pascal-slider' || slider.id === 'depth-slider' || slider.id === 'stress-slider') return;
+    playSliderSound(Number(slider.value), Number(slider.min || 0), Number(slider.max || 100));
+  }, { passive: true });
+
+  const QUIZ_DATA = [
+    {
+      q: 'What is the SI unit of pressure?',
+      opts: ['Newton (N)', 'Pascal (Pa)', 'Joule (J)', 'Watt (W)'],
+      ans: 1,
+      hint: 'It is named after Blaise Pascal.',
+      explain: 'The SI unit of pressure is the Pascal (Pa). 1 Pa = 1 N/m².'
+    },
+    {
+      q: 'If the same force acts on a smaller area, the pressure will…',
+      opts: ['Decrease', 'Stay the same', 'Increase', 'Disappear'],
+      ans: 2,
+      hint: 'Use P = F ÷ A.',
+      explain: 'Pressure increases when the area gets smaller while force stays the same.'
+    },
+    {
+      q: 'Which pressure is shown by a car tyre pressure gauge?',
+      opts: ['Atmospheric pressure', 'Gauge pressure', 'Absolute pressure', 'Differential pressure'],
+      ans: 1,
+      hint: 'It measures pressure relative to the air around us.',
+      explain: 'A tyre gauge shows gauge pressure, not absolute pressure.'
+    },
+    {
+      q: 'Pascal’s law is used in which device?',
+      opts: ['Hydraulic lift', 'Thermometer', 'Compass', 'Magnifying glass'],
+      ans: 0,
+      hint: 'It helps lift heavy cars in workshops.',
+      explain: 'Hydraulic systems work because pressure applied to a liquid is transmitted equally.'
+    },
+    {
+      q: 'What happens to pressure as you go deeper under water?',
+      opts: ['It decreases', 'It stays the same', 'It increases', 'It becomes zero'],
+      ans: 2,
+      hint: 'More water above you means more weight.',
+      explain: 'Water pressure increases with depth because more water presses down from above.'
+    },
+    {
+      q: 'Boyle’s law says that when the volume of a gas goes down, its pressure…',
+      opts: ['Goes down', 'Stays the same', 'Goes up', 'Stops'],
+      ans: 2,
+      hint: 'More squeezing means more collisions.',
+      explain: 'For a trapped gas, less volume means more frequent collisions and higher pressure.'
+    },
+    {
+      q: 'The heart creates pressure to…',
+      opts: ['Cool the body', 'Move blood through vessels', 'Make bones grow', 'Stop breathing'],
+      ans: 1,
+      hint: 'Blood must be pumped all around the body.',
+      explain: 'The heart pumps blood by creating pressure inside the blood vessels.'
+    }
+  ];
+
+  function initQuiz() {
+    const container = document.getElementById('quiz-container');
+    if (!container) return;
+
+    let current = 0;
+    let score = 0;
+    let answered = false;
+
+    const progressFill = container.querySelector('.quiz-progress-fill');
+    const metaQ = container.querySelector('.quiz-meta-q');
+    const metaScore = container.querySelector('.quiz-meta-score');
+    const questionWrap = container.querySelector('.quiz-q-wrap');
+    const optionsWrap = container.querySelector('.quiz-options');
+    const hintBtn = container.querySelector('.hint-btn');
+    const hintText = container.querySelector('.hint-text');
+    const feedbackBox = container.querySelector('.feedback-box');
+    const nextBtn = container.querySelector('.next-btn');
+    const resultsEl = container.querySelector('.quiz-results');
+    const resultsScore = container.querySelector('.results-score');
+    const resultsMsg = container.querySelector('.results-msg');
+    const tryAgainBtn = container.querySelector('.try-again-btn');
+    const questionView = container.querySelector('.quiz-question-view');
+
+    function loadQuestion(index) {
+      answered = false;
+      const data = QUIZ_DATA[index];
+      progressFill.style.width = ((index / QUIZ_DATA.length) * 100) + '%';
+      metaQ.textContent = `Question ${index + 1} of ${QUIZ_DATA.length}`;
+      metaScore.textContent = `Score: ${score}/${QUIZ_DATA.length}`;
+      questionWrap.querySelector('h3').textContent = data.q;
+      optionsWrap.innerHTML = '';
+
+      data.opts.forEach((opt, optionIndex) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt';
+        btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + optionIndex)}</span>${opt}`;
+        btn.addEventListener('click', () => selectAnswer(optionIndex, btn));
+        optionsWrap.appendChild(btn);
+      });
+
+      hintText.textContent = data.hint;
+      hintText.classList.remove('hint-open');
+      feedbackBox.classList.remove('fb-show', 'fb-correct', 'fb-wrong');
+      feedbackBox.textContent = '';
+      nextBtn.classList.remove('nb-show');
+      nextBtn.textContent = index < QUIZ_DATA.length - 1 ? 'Next Question →' : 'See Results 🎉';
+    }
+
+    function selectAnswer(chosenIndex, chosenBtn) {
+      if (answered) return;
+      answered = true;
+      const data = QUIZ_DATA[current];
+      const allOpts = optionsWrap.querySelectorAll('.quiz-opt');
+      allOpts.forEach(button => button.setAttribute('disabled', 'true'));
+
+      if (chosenIndex === data.ans) {
+        score++;
+        chosenBtn.classList.add('opt-correct');
+        feedbackBox.textContent = '✅ Correct! ' + data.explain;
+        feedbackBox.className = 'feedback-box fb-show fb-correct';
+        playCorrectSound();
+      } else {
+        chosenBtn.classList.add('opt-wrong');
+        allOpts[data.ans].classList.add('opt-correct');
+        feedbackBox.textContent = '❌ Not quite. ' + data.explain;
+        feedbackBox.className = 'feedback-box fb-show fb-wrong';
+        playWrongSound();
+      }
+
+      metaScore.textContent = `Score: ${score}/${QUIZ_DATA.length}`;
+      nextBtn.classList.add('nb-show');
+    }
+
+    hintBtn.addEventListener('click', () => {
+      const open = hintText.classList.toggle('hint-open');
+      hintBtn.setAttribute('aria-expanded', open);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      current++;
+      if (current >= QUIZ_DATA.length) {
+        questionView.style.display = 'none';
+        resultsEl.classList.add('qr-show');
+        progressFill.style.width = '100%';
+        resultsScore.textContent = `${score} / ${QUIZ_DATA.length}`;
+        resultsMsg.textContent = score >= 6 ? '🏆 Outstanding! You are a pressure expert!' : score >= 4 ? '🎉 Great job! A little more practice and you’ll nail it.' : score >= 2 ? '📖 Good try! Re-read the sections and try again.' : '💪 Keep going! Every attempt makes you smarter.';
+      } else {
+        loadQuestion(current);
+      }
+    });
+
+    tryAgainBtn.addEventListener('click', () => {
+      current = 0;
+      score = 0;
+      questionView.style.display = '';
+      resultsEl.classList.remove('qr-show');
+      loadQuestion(0);
+    });
+
+    loadQuestion(0);
+  }
+
+  initQuiz();
+})();
+</script>
+</body>
+</html>
