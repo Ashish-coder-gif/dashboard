@@ -577,14 +577,14 @@ footer b{color:var(--tomato)}
 
   // Voice synthesis helper
   function speak(text) {
-    if (!window.speechSynthesis) return;
+    if (muted || !window.speechSynthesis) return;
     try {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.pitch = 1.6;
-      utterance.rate = 1.1;
+      utterance.pitch = 1.35; // slightly high but natural cartoon pitch
+      utterance.rate = 1.0;   // normal speed
       const voices = window.speechSynthesis.getVoices();
-      const voice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Zira')));
+      const voice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google US English') || v.name.includes('Zira') || v.name.includes('Microsoft') || v.name.includes('Natural')));
       if (voice) utterance.voice = voice;
       window.speechSynthesis.speak(utterance);
     } catch(err) {
