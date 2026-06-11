@@ -237,9 +237,47 @@ footer b{color:var(--tomato)}
   .doodle{animation:none}
   *{transition-duration:.01ms !important;animation-duration:.01ms !important}
 }
+
+/* Music Toggle Button */
+.music-toggle-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  border: 3px solid #F2E3CC;
+  box-shadow: 0 6px 16px rgba(59, 43, 43, 0.15);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.music-toggle-btn:hover {
+  transform: scale(1.1);
+  background: #FFF;
+  box-shadow: 0 8px 24px rgba(59, 43, 43, 0.25);
+}
+.music-toggle-btn:active {
+  transform: scale(0.92);
+}
+@media (prefers-reduced-motion: reduce) {
+  .music-toggle-btn { transition: none; }
+}
 </style>
 </head>
 <body>
+
+<!-- Music Toggle Button -->
+<button id="musicToggleBtn" class="music-toggle-btn" aria-label="Toggle background music">🔇</button>
 
 <!-- ========= SHARED NAV ========= -->
 <nav class="site-nav" role="navigation" aria-label="Site navigation">
@@ -405,6 +443,26 @@ footer b{color:var(--tomato)}
   let audioCtx = null;
   let forceOsc = null;
   let forceGain = null;
+  let musicPlaying = false;
+  let sequencerInterval = null;
+  let sequencerStep = 0;
+  let hasSpokenDonotCut = false;
+
+  const SCALE = {
+    C3: 130.81, D3: 146.83, E3: 164.81, G3: 196.00, A3: 220.00,
+    C4: 261.63, D4: 293.66, E4: 329.63, G4: 392.00, A4: 440.00,
+    C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880.00
+  };
+
+  const BASS_PATTERN = [
+    'C3', null, 'G3', null, 'C3', null, 'G3', null,
+    'A3', null, 'E3', null, 'F3', null, 'C4', null
+  ];
+
+  const MELODY_PATTERN = [
+    'E4', 'G4', 'C5', null, 'D5', 'C5', 'G4', null,
+    'A4', 'C5', 'E5', 'D5', 'C5', null, 'G4', null
+  ];
 
   function getAudioContext() {
     const Ctor = window.AudioContext || window.webkitAudioContext;
@@ -418,6 +476,108 @@ footer b{color:var(--tomato)}
     const ctx = getAudioContext();
     if (!ctx || ctx.state === 'running') return;
     ctx.resume().catch(() => {});
+    
+    // Auto-start music if preference is not 'off'
+    if (localStorage.getItem('pressurePlaygroundMusic') !== 'off') {
+      startBackgroundMusic();
+      const btn = document.getElementById('musicToggleBtn');
+      if (btn) btn.textContent = '🎵';
+    }
+  }
+
+  function playSequencerStep() {
+    const ctx = getAudioContext();
+    if (!ctx || !musicPlaying) return;
+
+    const time = ctx.currentTime;
+    const step = sequencerStep % 16;
+    
+    const bassNote = BASS_PATTERN[step];
+    const melodyNote = MELODY_PATTERN[step];
+
+    if (bassNote && SCALE[bassNote]) {
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(SCALE[bassNote], time);
+      
+      gainNode.gain.setValueAtTime(0.0001, time);
+      gainNode.gain.exponentialRampToValueAtTime(0.012, time + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, time + 0.28);
+      
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      osc.start(time);
+      osc.stop(time + 0.3);
+    }
+
+    if (melodyNote && SCALE[melodyNote]) {
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(SCALE[melodyNote], time);
+      
+      gainNode.gain.setValueAtTime(0.0001, time);
+      gainNode.gain.exponentialRampToValueAtTime(0.006, time + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, time + 0.16);
+      
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      osc.start(time);
+      osc.stop(time + 0.18);
+    }
+
+    sequencerStep++;
+  }
+
+  function startBackgroundMusic() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (sequencerInterval) return;
+
+    musicPlaying = true;
+    sequencerStep = 0;
+    sequencerInterval = setInterval(playSequencerStep, 150);
+  }
+
+  function stopBackgroundMusic() {
+    musicPlaying = false;
+    if (sequencerInterval) {
+      clearInterval(sequencerInterval);
+      sequencerInterval = null;
+    }
+  }
+
+  function toggleMusic() {
+    const btn = document.getElementById('musicToggleBtn');
+    if (!btn) return;
+    const ctx = getAudioContext();
+    if (musicPlaying) {
+      stopBackgroundMusic();
+      btn.textContent = '🔇';
+      localStorage.setItem('pressurePlaygroundMusic', 'off');
+    } else {
+      startBackgroundMusic();
+      btn.textContent = '🎵';
+      localStorage.setItem('pressurePlaygroundMusic', 'on');
+    }
+  }
+
+  // Voice synthesis helper
+  function speak(text) {
+    if (!window.speechSynthesis) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.pitch = 1.6;
+      utterance.rate = 1.1;
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Zira')));
+      if (voice) utterance.voice = voice;
+      window.speechSynthesis.speak(utterance);
+    } catch(err) {
+      console.warn("Speech Synthesis failed:", err);
+    }
   }
 
   function tone({ frequency = 440, duration = 0.07, type = 'sine', gain = 0.03, slideTo = null } = {}) {
@@ -679,6 +839,15 @@ footer b{color:var(--tomato)}
         stopForceSound();
       }
 
+      if (holding && force > 45 && !hasSpokenDonotCut) {
+        hasSpokenDonotCut = true;
+        speak("No, please don't cut me! I want to live!");
+        say("No, please don't cut me! I want to live! 😭", 3200);
+      }
+      if (!holding) {
+        hasSpokenDonotCut = false;
+      }
+
       const area = AREAS[knife];
       const pressure = force / area;
 
@@ -809,6 +978,23 @@ footer b{color:var(--tomato)}
 
   // ---------- friendly nudges ----------
   setTimeout(()=>say("Hi! I'm Tommy the Tomato 🍅 Try to cut me… if you can!"),700);
+
+  // ---------- background music initialization ----------
+  (function initMusic() {
+    const btn = document.getElementById('musicToggleBtn');
+    if (!btn) return;
+    const pref = localStorage.getItem('pressurePlaygroundMusic');
+    if (pref === 'on' || pref === null) {
+      btn.textContent = '🎵';
+    } else {
+      btn.textContent = '🔇';
+    }
+    btn.addEventListener('click', toggleMusic);
+    
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+    }
+  })();
 
   // ---------- audio unlock events ----------
   window.addEventListener("pointerdown", unlockAudio, { passive: true, capture: true, once: true });
