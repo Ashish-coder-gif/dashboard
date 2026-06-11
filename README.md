@@ -2,6 +2,8 @@
 
 An interactive, browser-only educational site that teaches **Pressure = Force ÷ Area** to school students (Class 9–11). No server, no build step — just open the HTML files in any modern browser.
 
+🚀 **Live on Vercel:** https://dashboard-ashish-coder-gif.vercel.app
+
 ---
 
 ## Pages
@@ -9,6 +11,7 @@ An interactive, browser-only educational site that teaches **Pressure = Force ÷
 | Page | File | Description |
 |------|------|-------------|
 | 🍅 **Play** | `index.html` | Interactive game: choose a knife, hold PRESS, watch a tomato get sliced — or squished. Demonstrates P = F/A live. |
+| 🍅 **Pressure Playground** | `pressure-veggie-cutting.html` | Enhanced interactive cutting simulator with audio feedback (nogod.mp3). Choose between sharp and blunt knives and experience pressure in action! |
 | 📖 **Learn** | `learn.html` | Full learning module: 6 sections, 7 animated/interactive diagrams, 3 real-world story cards, 6 solved examples, and a 7-question quiz. |
 
 ---
@@ -17,12 +20,14 @@ An interactive, browser-only educational site that teaches **Pressure = Force ÷
 
 ```
 /
-├── index.html          ← Game page (original; nav bar added)
-├── learn.html          ← Learn module
+├── index.html                  ← Game page
+├── learn.html                  ← Learn module
+├── pressure-veggie-cutting.html ← Interactive cutting simulator with audio
+├── nogod.mp3                   ← Audio file for cutting feedback
 ├── css/
-│   └── learn.css       ← All styles for learn.html (uses same design tokens as game)
+│   └── learn.css               ← All styles for learn.html (uses same design tokens as game)
 ├── js/
-│   └── learn.js        ← All interactivity: animations, quiz, TOC scroll-spy
+│   └── learn.js                ← All interactivity: animations, quiz, TOC scroll-spy
 └── README.md
 ```
 
