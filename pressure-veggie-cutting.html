@@ -365,6 +365,11 @@ footer b{color:var(--tomato)}
 
 <footer>Made for <b>PressureVerse</b> · Pressure = Force ÷ Area · Smaller area, bigger pressure! ⚡</footer>
 
+<!-- Audio for cutting -->
+<audio id="cutAudio" preload="auto">
+  <source src="nogod.mp3" type="audio/mpeg">
+</audio>
+
 <script>
 (function(){
   "use strict";
@@ -725,6 +730,11 @@ footer b{color:var(--tomato)}
     cutting = true; stopHold();
     stopForceSound();
     playCutSound();
+    const cutAudio = $("cutAudio");
+    if (cutAudio) {
+      cutAudio.currentTime = 0;
+      cutAudio.play().catch(() => {});
+    }
     slices++; sliceCountEl.textContent = slices;
 
     // knife slash down
