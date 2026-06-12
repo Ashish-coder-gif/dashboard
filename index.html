@@ -245,9 +245,46 @@ footer b{color:var(--tomato)}
   *{transition-duration:.01ms !important;animation-duration:.01ms !important}
 }
 
+/* Music Toggle Button */
+.music-toggle-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  border: 3px solid #F2E3CC;
+  box-shadow: 0 6px 16px rgba(59, 43, 43, 0.15);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.music-toggle-btn:hover {
+  transform: scale(1.1);
+  background: #FFF;
+  box-shadow: 0 8px 24px rgba(59, 43, 43, 0.25);
+}
+.music-toggle-btn:active {
+  transform: scale(0.92);
+}
+@media (prefers-reduced-motion: reduce) {
+  .music-toggle-btn { transition: none; }
+}
 </style>
 </head>
 <body>
+
+<!-- Music Toggle Button -->
+<button id="musicToggleBtn" class="music-toggle-btn" aria-label="Toggle background music">🔇</button>
 
 <!-- ========= SHARED NAV ========= -->
 <nav class="site-nav" role="navigation" aria-label="Site navigation">
@@ -449,14 +486,14 @@ footer b{color:var(--tomato)}
 
   function unlockAudio() {
     const ctx = getAudioContext();
-    if (!ctx) return;
-    if (ctx.state === 'suspended') {
-      ctx.resume().catch(() => {});
-    }
+    if (!ctx || ctx.state === 'running') return;
+    ctx.resume().catch(() => {});
     
-    // Auto-start music if not muted
-    if (!muted) {
+    // Auto-start music if preference is not 'off'
+    if (localStorage.getItem('pressurePlaygroundMusic') !== 'off') {
       startBackgroundMusic();
+      const btn = document.getElementById('musicToggleBtn');
+      if (btn) btn.textContent = '🎵';
     }
   }
 
@@ -523,18 +560,35 @@ footer b{color:var(--tomato)}
     }
   }
 
-  let speechAudio = null;
-  // Voice synthesis helper (replaced with custom audio play)
+  function toggleMusic() {
+    const btn = document.getElementById('musicToggleBtn');
+    if (!btn) return;
+    const ctx = getAudioContext();
+    if (musicPlaying) {
+      stopBackgroundMusic();
+      btn.textContent = '🔇';
+      localStorage.setItem('pressurePlaygroundMusic', 'off');
+    } else {
+      startBackgroundMusic();
+      btn.textContent = '🎵';
+      localStorage.setItem('pressurePlaygroundMusic', 'on');
+    }
+  }
+
+  // Voice synthesis helper
   function speak(text) {
-    if (muted) return;
+    if (muted || !window.speechSynthesis) return;
     try {
-      if (!speechAudio) {
-        speechAudio = new Audio('nogod.mp3');
-      }
-      speechAudio.currentTime = 0;
-      speechAudio.play().catch(err => console.warn("Speech audio play failed:", err));
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.pitch = 1.35; // slightly high but natural cartoon pitch
+      utterance.rate = 1.0;   // normal speed
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google US English') || v.name.includes('Zira') || v.name.includes('Microsoft') || v.name.includes('Natural')));
+      if (voice) utterance.voice = voice;
+      window.speechSynthesis.speak(utterance);
     } catch(err) {
-      console.warn("Speech audio initialization failed:", err);
+      console.warn("Speech Synthesis failed:", err);
     }
   }
 
@@ -559,16 +613,6 @@ footer b{color:var(--tomato)}
     if (soundToggleBtn) {
       soundToggleBtn.textContent = m ? '🔇' : '🔊';
       soundToggleBtn.setAttribute('aria-label', m ? 'Sound off — tap to unmute' : 'Sound on — tap to mute');
-    }
-    if (m) {
-      stopBackgroundMusic();
-      if (speechAudio && !speechAudio.paused) {
-        speechAudio.pause();
-      }
-    } else {
-      if (audioCtx) {
-        startBackgroundMusic();
-      }
     }
   }
 
@@ -633,19 +677,8 @@ footer b{color:var(--tomato)}
     noise.stop(ctx.currentTime + duration + 0.03);
   }
 
-  let cutAudio = null;
   function playCutSound() {
-    if (muted) return;
-    if (!cutAudio) {
-      cutAudio = new Audio('cut.mp3');
-    }
-    cutAudio.currentTime = 0;
-    cutAudio.play().then(() => {
-      // Custom cutting sound played successfully
-    }).catch(err => {
-      // Fallback to synthetic chiptune cut sound
-      playNoise({ duration: 0.16, gain: 0.06, filterStart: 2500, filterEnd: 150 });
-    });
+    playNoise({ duration: 0.16, gain: 0.06, filterStart: 2500, filterEnd: 150 });
   }
 
   function playSquashSound() {
@@ -874,9 +907,6 @@ footer b{color:var(--tomato)}
       }
       if (!holding) {
         hasSpokenDonotCut = false;
-        if (speechAudio && !speechAudio.paused) {
-          speechAudio.pause();
-        }
       }
 
       const area = AREAS[knife];
@@ -1012,7 +1042,19 @@ footer b{color:var(--tomato)}
 
   // ---------- background music initialization ----------
   (function initMusic() {
-    // Background music starts on user interaction if not muted.
+    const btn = document.getElementById('musicToggleBtn');
+    if (!btn) return;
+    const pref = localStorage.getItem('pressurePlaygroundMusic');
+    if (pref === 'on' || pref === null) {
+      btn.textContent = '🎵';
+    } else {
+      btn.textContent = '🔇';
+    }
+    btn.addEventListener('click', toggleMusic);
+    
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+    }
   })();
 
   // ---------- audio unlock events ----------

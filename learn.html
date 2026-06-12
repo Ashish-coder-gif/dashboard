@@ -501,6 +501,40 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
   .custom-cursor-active,.custom-cursor-active *{cursor:auto!important}
 }
 
+/* Music Toggle Button */
+.music-toggle-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  border: 3px solid #F2E3CC;
+  box-shadow: 0 6px 16px rgba(59, 43, 43, 0.15);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.music-toggle-btn:hover {
+  transform: scale(1.1);
+  background: #FFF;
+  box-shadow: 0 8px 24px rgba(59, 43, 43, 0.25);
+}
+.music-toggle-btn:active {
+  transform: scale(0.92);
+}
+@media (prefers-reduced-motion: reduce) {
+  .music-toggle-btn { transition: none; }
+}
 </style>
 </head>
 <body>
@@ -510,6 +544,9 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
 <div class="cursor-ring"   id="cursor-ring"></div>
 <div class="cursor-ring2"  id="cursor-ring2"></div>
 <span class="cursor-label" id="cursor-label"></span>
+
+<!-- Music Toggle Button -->
+<button id="musicToggleBtn" class="music-toggle-btn" aria-label="Toggle background music">🔇</button>
 
 <!-- NAV -->
 <nav class="site-nav">
@@ -2396,14 +2433,14 @@ function resetRocket(){
 
   function unlockAudio() {
     const ctx = getAudioContext();
-    if (!ctx) return;
-    if (ctx.state === 'suspended') {
-      ctx.resume().catch(() => {});
-    }
+    if (!ctx || ctx.state === 'running') return;
+    ctx.resume().catch(() => {});
     
-    // Auto-start music if not muted
-    if (!muted) {
+    // Auto-start music if preference is not 'off'
+    if (localStorage.getItem('pressurePlaygroundMusic') !== 'off') {
       startBackgroundMusic();
+      const btn = document.getElementById('musicToggleBtn');
+      if (btn) btn.textContent = '🎵';
     }
   }
 
@@ -2470,7 +2507,20 @@ function resetRocket(){
     }
   }
 
-  function toggleMusic() {}
+  function toggleMusic() {
+    const btn = document.getElementById('musicToggleBtn');
+    if (!btn) return;
+    const ctx = getAudioContext();
+    if (musicPlaying) {
+      stopBackgroundMusic();
+      btn.textContent = '🔇';
+      localStorage.setItem('pressurePlaygroundMusic', 'off');
+    } else {
+      startBackgroundMusic();
+      btn.textContent = '🎵';
+      localStorage.setItem('pressurePlaygroundMusic', 'on');
+    }
+  }
 
   // master bus — every sound routes through this so mute controls everything
   function masterBus(ctx) {
@@ -2493,13 +2543,6 @@ function resetRocket(){
     if (soundToggleBtn) {
       soundToggleBtn.textContent = m ? '🔇' : '🔊';
       soundToggleBtn.setAttribute('aria-label', m ? 'Sound off — tap to unmute' : 'Sound on — tap to mute');
-    }
-    if (m) {
-      stopBackgroundMusic();
-    } else {
-      if (audioCtx) {
-        startBackgroundMusic();
-      }
     }
   }
 
@@ -3183,7 +3226,15 @@ function resetRocket(){
 
   // Initialize background music
   (function initMusic() {
-    // Background music starts on user interaction if not muted.
+    const btn = document.getElementById('musicToggleBtn');
+    if (!btn) return;
+    const pref = localStorage.getItem('pressurePlaygroundMusic');
+    if (pref === 'on' || pref === null) {
+      btn.textContent = '🎵';
+    } else {
+      btn.textContent = '🔇';
+    }
+    btn.addEventListener('click', toggleMusic);
   })();
 })();
 </script>
