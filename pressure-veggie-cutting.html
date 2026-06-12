@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pressure Playground 🍅 — Why Does a Sharp Knife Cut?</title>
+<title>Pressure Playground — Why Does a Sharp Knife Cut?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -38,8 +38,9 @@ body{
   min-height:100vh;
   overflow-x:hidden;
 }
-/* floating veggie doodles */
-.doodle{position:fixed;font-size:30px;opacity:.16;animation:floaty 7s ease-in-out infinite;pointer-events:none;user-select:none;z-index:0}
+/* floating physics doodles */
+.doodle{position:fixed;width:46px;opacity:.2;animation:floaty 7s ease-in-out infinite;pointer-events:none;user-select:none;z-index:0}
+.doodle svg{display:block;width:100%;height:auto}
 @keyframes floaty{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-16px) rotate(8deg)}}
 
 header{
@@ -170,7 +171,7 @@ h1 .green{color:var(--leaf)}
   background:var(--cut);
 }
 .cutline::after{
-  content:"CUT LINE ✂️";position:absolute;top:-20px;left:50%;transform:translateX(-50%);
+  content:"CUT LINE";position:absolute;top:-20px;left:50%;transform:translateX(-50%);
   font-size:.62rem;font-weight:800;color:var(--cut);white-space:nowrap;
 }
 .formula{
@@ -211,13 +212,13 @@ footer b{color:var(--tomato)}
 </head>
 <body>
 
-<span class="doodle" style="top:12%;left:4%">🥕</span>
-<span class="doodle" style="top:70%;left:6%;animation-delay:1.2s">🍆</span>
-<span class="doodle" style="top:18%;right:5%;animation-delay:.6s">🥒</span>
-<span class="doodle" style="top:75%;right:4%;animation-delay:1.8s">🧅</span>
+<span class="doodle" style="top:12%;left:4%" aria-hidden="true"><svg viewBox="0 0 60 28" fill="none"><text x="2" y="21" font-family="'Fredoka One',sans-serif" font-size="19" fill="#FF9F2E">F</text><line x1="22" y1="14" x2="50" y2="14" stroke="#FF9F2E" stroke-width="2.6" stroke-linecap="round"/><path d="M44 7.5 51 14l-7 6.5" stroke="#FF9F2E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="doodle" style="top:70%;left:6%;animation-delay:1.2s" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="7" stroke="#A04EF6" stroke-width="2.4"/><circle cx="24" cy="24" r="14" stroke="#A04EF6" stroke-width="2.2" opacity=".55"/><circle cx="24" cy="24" r="21" stroke="#A04EF6" stroke-width="2" opacity=".3"/></svg></span>
+<span class="doodle" style="top:18%;right:5%;animation-delay:.6s" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><rect x="2" y="2" width="36" height="36" rx="5" stroke="#3E8BFA" stroke-width="2.4"/><line x1="14" y1="2" x2="14" y2="38" stroke="#3E8BFA" stroke-width="1.6" opacity=".7"/><line x1="26" y1="2" x2="26" y2="38" stroke="#3E8BFA" stroke-width="1.6" opacity=".7"/><line x1="2" y1="14" x2="38" y2="14" stroke="#3E8BFA" stroke-width="1.6" opacity=".7"/><line x1="2" y1="26" x2="38" y2="26" stroke="#3E8BFA" stroke-width="1.6" opacity=".7"/></svg></span>
+<span class="doodle" style="top:75%;right:4%;animation-delay:1.8s" aria-hidden="true"><svg viewBox="0 0 60 22" fill="none"><rect x="2" y="3" width="56" height="16" rx="4" stroke="#58B368" stroke-width="2.4"/><g stroke="#58B368" stroke-width="1.8" opacity=".8"><line x1="12" y1="3" x2="12" y2="10"/><line x1="22" y1="3" x2="22" y2="13"/><line x1="32" y1="3" x2="32" y2="10"/><line x1="42" y1="3" x2="42" y2="13"/><line x1="52" y1="3" x2="52" y2="10"/></g></svg></span>
 
 <header>
-  <h1><span class="red">Pressure</span> <span class="green">Playground</span> 🍅🔪</h1>
+  <h1><span class="red">Pressure</span> <span class="green">Playground</span></h1>
   <p class="subtitle">Help Arjun cut the tomato! Same push, different knives… <b>which one wins?</b></p>
 </header>
 
@@ -226,8 +227,8 @@ footer b{color:var(--tomato)}
   <!-- ================= SCENE ================= -->
   <section class="panel scene-panel">
     <div class="scene-title">
-      <span>👨‍🍳 Arjun's Kitchen</span>
-      <span class="score">🍅 Slices: <span id="sliceCount">0</span></span>
+      <span>Arjun's Kitchen</span>
+      <span class="score">Slices: <span id="sliceCount">0</span></span>
     </div>
 
     <div class="scene" id="scene">
@@ -310,12 +311,12 @@ footer b{color:var(--tomato)}
       <div class="knives" style="margin-top:8px">
         <div class="knife-card" id="cardBlunt" role="button" tabindex="0" aria-pressed="false">
           <svg viewBox="0 0 120 50"><rect x="6" y="18" width="32" height="14" rx="6" fill="#7B4B2A"/><path d="M38 14 L112 14 L112 30 Q 75 42 38 36 Z" fill="#C9CFD8"/><rect x="60" y="30" width="52" height="9" rx="4.5" fill="#9AA3B0"/></svg>
-          <div class="knife-name">😕 Blunt Knife</div>
+          <div class="knife-name">Blunt Knife</div>
           <div class="knife-area">Edge area = 10 cm²</div>
         </div>
         <div class="knife-card active" id="cardSharp" role="button" tabindex="0" aria-pressed="true">
           <svg viewBox="0 0 120 50"><rect x="6" y="18" width="32" height="14" rx="6" fill="#7B4B2A"/><path d="M38 14 L112 14 L114 25 L38 34 Z" fill="#D9DEE6"/><path d="M38 24 L114 25 L38 34 Z" fill="#AEB7C4"/></svg>
-          <div class="knife-name">😎 Sharp Knife</div>
+          <div class="knife-name">Sharp Knife</div>
           <div class="knife-area">Edge area = 1 cm²</div>
         </div>
       </div>
@@ -324,7 +325,7 @@ footer b{color:var(--tomato)}
     <div>
       <div class="step-label"><span class="num">2</span> Hold to push down</div>
       <button class="press-btn" id="pressBtn" style="margin-top:8px">
-        ✋ HOLD TO PRESS!
+        <svg style="height:1em;width:auto;vertical-align:-2px" viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="17" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M5 12.5 12 20l7-7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg> HOLD TO PRESS!
         <small>(or hold the SPACE bar)</small>
       </button>
     </div>
@@ -333,12 +334,12 @@ footer b{color:var(--tomato)}
       <div class="step-label"><span class="num">3</span> Watch the pressure!</div>
 
       <div class="meter force">
-        <div class="meter-head"><span style="color:var(--force)">💪 Force (your push)</span><span class="val" id="forceVal">0 N</span></div>
+        <div class="meter-head"><span style="color:var(--force)"><svg style="height:.9em;width:auto;vertical-align:-1px;margin-right:3px" viewBox="0 0 40 20" fill="none" aria-hidden="true"><line x1="2" y1="10" x2="30" y2="10" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><path d="M24 3l8 7-8 7" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Force (your push)</span><span class="val" id="forceVal">0 N</span></div>
         <div class="bar"><div class="fill" id="forceFill"></div></div>
       </div>
 
       <div class="meter pressure-bar">
-        <div class="meter-head"><span style="color:var(--pressure)">⚡ Pressure (the magic!)</span><span class="val" id="pressVal">0 N/cm²</span></div>
+        <div class="meter-head"><span style="color:var(--pressure)"><svg style="height:.9em;width:auto;vertical-align:-1px;margin-right:3px" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l2.1 7.9L22 12l-7.9 2.1L12 22l-2.1-7.9L2 12l7.9-2.1Z" fill="currentColor"/></svg>Pressure (the magic!)</span><span class="val" id="pressVal">0 N/cm²</span></div>
         <div class="bar">
           <div class="fill" id="pressFill"></div>
           <div class="cutline"></div>
@@ -350,13 +351,13 @@ footer b{color:var(--tomato)}
         → <span class="live" id="formulaLive">0 ÷ 1 = 0</span>
       </div>
 
-      <div class="takeaway" id="takeaway">💡 <span id="takeawayText">Smaller area → bigger pressure. Try both knives and feel the difference!</span></div>
+      <div class="takeaway" id="takeaway"><svg style="height:1em;width:auto;vertical-align:-2px;margin-right:2px" viewBox="0 0 28 36" fill="none" aria-hidden="true"><path d="M14 3a9 9 0 0 0-5.2 16.3c1.2.9 1.9 2 1.9 3.2h6.6c0-1.2.7-2.3 1.9-3.2A9 9 0 0 0 14 3Z" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><line x1="10.5" y1="27" x2="17.5" y2="27" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><line x1="11.5" y1="31" x2="16.5" y2="31" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg> <span id="takeawayText">Smaller area → bigger pressure. Try both knives and feel the difference!</span></div>
     </div>
 
   </section>
 </main>
 
-<footer>Made for <b>PressureVerse</b> · Pressure = Force ÷ Area · Smaller area, bigger pressure! ⚡</footer>
+<footer>Made for <b>PressureVerse</b> · Pressure = Force ÷ Area · Smaller area, bigger pressure!</footer>
 
 <!-- Audio for cutting -->
 <audio id="cutAudio" preload="auto">
@@ -742,8 +743,8 @@ footer b{color:var(--tomato)}
 
       confettiBurst();
       playConfettiSound();
-      say("SLICED! ✂️🎉 Tiny area = HUGE pressure!");
-      setTakeaway(`Just ${Math.round(fUsed)} N of force on a 1 cm² edge → ${Math.round(pUsed)} N/cm² of pressure. Way past the cut line — slice! 🎉`,"good");
+      say("SLICED! Tiny area = HUGE pressure!");
+      setTakeaway(`Just ${Math.round(fUsed)} N of force on a 1 cm² edge → ${Math.round(pUsed)} N/cm² of pressure. Way past the cut line — slice!`,"good");
     },140);
 
     // reset

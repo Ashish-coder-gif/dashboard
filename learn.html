@@ -43,7 +43,8 @@ body{background:var(--cream);color:var(--ink);font-family:'Nunito',sans-serif;
   box-shadow:0 10px 24px rgba(59,43,43,.12);padding:24px;overflow:hidden}
 .card-title{font-family:'Fredoka One',sans-serif;font-size:1.35rem;color:var(--ink);
   margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.card-title span.em{font-size:1.5rem}
+.card-title span.em{display:inline-flex;align-items:center;flex:0 0 auto}
+.card-title span.em svg{height:1.45rem;width:auto;display:block}
 
 /* content flow helpers */
 .hero-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}
@@ -70,6 +71,20 @@ body{background:var(--cream);color:var(--ink);font-family:'Nunito',sans-serif;
 .hook-arrow{margin-top:10px;text-align:center;font-family:'Fredoka One',sans-serif;font-size:1rem;
   color:var(--pressure);opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease}
 .hook-arrow.visible{opacity:1;transform:none}
+
+/* concept icons — soft vector replacements for emojis */
+.hook-icon{display:inline-flex;align-items:center;vertical-align:middle;margin-left:10px}
+.hook-icon svg{height:1.1em;width:auto;display:block}
+.hook-icon-force svg{animation:iconNudge 1.9s ease-in-out infinite}
+.hook-icon-area svg{animation:iconBreathe 3s ease-in-out infinite}
+.hook-icon-question svg{animation:iconGlow 2.4s ease-in-out infinite}
+@keyframes iconNudge{0%,100%{transform:translateX(0)}55%{transform:translateX(5px)}}
+@keyframes iconBreathe{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+@keyframes iconGlow{
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 rgba(160,78,246,0))}
+  50%{transform:scale(1.1);filter:drop-shadow(0 0 7px rgba(160,78,246,.6))}
+}
+.badge-icon{height:1em;width:auto;vertical-align:-2px;margin-right:6px}
 
 .pressure-types-flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0 16px}
 .pressure-type-node{flex:1 1 150px;min-width:150px;background:#fff;border:3px solid #F2E3CC;
@@ -169,13 +184,14 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
 
 /* floating physics symbols */
 @keyframes floatUp{
-  0%  {transform:translateY(0) translateX(0) rotate(0deg);opacity:0}
-  8%  {opacity:.07}
-  92% {opacity:.07}
-  100%{transform:translateY(-110vh) translateX(var(--drift,30px)) rotate(360deg);opacity:0}
+  0%  {transform:translateY(0) translateX(0) rotate(-8deg);opacity:0}
+  8%  {opacity:.13}
+  92% {opacity:.13}
+  100%{transform:translateY(-110vh) translateX(var(--drift,30px)) rotate(14deg);opacity:0}
 }
-.float-sym{position:fixed;bottom:-60px;pointer-events:none;z-index:0;opacity:0;user-select:none;
+.float-sym{position:fixed;bottom:-60px;width:36px;pointer-events:none;z-index:0;opacity:0;user-select:none;
   animation:floatUp var(--dur,14s) linear infinite;animation-delay:var(--delay,0s)}
+.float-sym svg{display:block;width:100%;height:auto}
 
 /* scroll progress bar */
 .scroll-progress{position:fixed;top:58px;left:0;width:0%;height:3px;z-index:110;
@@ -557,39 +573,72 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
   .custom-cursor-active,.custom-cursor-active *{cursor:auto!important}
 }
 
-/* Music Toggle Button */
-.music-toggle-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.75);
-  border: 3px solid #F2E3CC;
-  box-shadow: 0 6px 16px rgba(59, 43, 43, 0.15);
-  font-size: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+/* ── Hire Assistant — voice tutor ─────────────── */
+.assistant-btn{
+  position:fixed;bottom:20px;right:20px;z-index:1000;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 18px;border-radius:999px;border:3px solid #F2E3CC;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  font-family:'Fredoka One',sans-serif;font-size:.95rem;color:var(--pressure);
+  cursor:pointer;box-shadow:0 6px 16px rgba(59,43,43,.15);
+  transition:transform .2s,box-shadow .2s,background .2s,color .2s;
+  user-select:none;-webkit-tap-highlight-color:transparent}
+.assistant-btn:hover{transform:translateY(-2px);background:#fff;box-shadow:0 8px 24px rgba(59,43,43,.25)}
+.assistant-btn:active{transform:scale(.95)}
+.assistant-btn svg{height:1.25em;width:auto;display:block}
+.assistant-btn.hired{color:#c0392b}
+
+.assistant-card{
+  position:fixed;bottom:80px;right:20px;z-index:999;width:324px;max-width:calc(100vw - 32px);
+  background:#fff;border:3px solid #F2E3CC;border-radius:var(--radius);
+  box-shadow:0 18px 40px rgba(59,43,43,.22);padding:16px;
+  opacity:0;visibility:hidden;transform:translateY(14px) scale(.96);
+  transition:opacity .35s ease,transform .35s cubic-bezier(.34,1.56,.64,1),visibility .35s}
+.assistant-card.open{opacity:1;visibility:visible;transform:none}
+.assistant-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.assistant-avatar{flex:0 0 auto;width:48px;height:48px;border-radius:50%;background:#F6EDFF;
+  border:2px solid #E5D4FA;display:flex;align-items:center;justify-content:center}
+.assistant-avatar svg{width:36px;height:36px;display:block}
+.assistant-name{font-family:'Fredoka One',sans-serif;font-size:1rem;color:var(--ink);line-height:1.15}
+.assistant-role{font-size:.7rem;font-weight:800;color:#9b8a7e;letter-spacing:.07em;text-transform:uppercase}
+.assistant-eq{display:none;align-items:flex-end;gap:3px;height:16px;margin-left:auto}
+.assistant-eq i{width:3.5px;border-radius:2px;background:var(--pressure);height:30%;animation:eqBar 1s ease-in-out infinite}
+.assistant-eq i:nth-child(2){animation-delay:.15s}
+.assistant-eq i:nth-child(3){animation-delay:.3s}
+.assistant-eq i:nth-child(4){animation-delay:.45s}
+@keyframes eqBar{0%,100%{height:30%}50%{height:100%}}
+.assistant-card.speaking .assistant-eq{display:flex}
+.assistant-card.speaking .assistant-avatar{animation:avatarBob 1.6s ease-in-out infinite}
+@keyframes avatarBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.assistant-card.happy .assistant-avatar{animation:avatarHappy .9s cubic-bezier(.34,1.56,.64,1)}
+@keyframes avatarHappy{
+  0%{transform:rotate(0) scale(1)}
+  25%{transform:rotate(-8deg) scale(1.12)}
+  50%{transform:rotate(8deg) scale(1.12)}
+  75%{transform:rotate(-4deg) scale(1.05)}
+  100%{transform:rotate(0) scale(1)}
 }
-.music-toggle-btn:hover {
-  transform: scale(1.1);
-  background: #FFF;
-  box-shadow: 0 8px 24px rgba(59, 43, 43, 0.25);
+.assistant-topic{font-family:'Fredoka One',sans-serif;font-size:.92rem;color:var(--pressure);margin-bottom:6px}
+.assistant-text{font-size:.92rem;line-height:1.55;color:#5d4f4f;max-height:160px;overflow-y:auto;margin-bottom:12px}
+.assistant-controls{display:flex;flex-wrap:wrap;gap:8px}
+.assistant-chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+  border:2px solid #F2E3CC;background:#FFF6E9;padding:7px 13px;cursor:pointer;
+  font-family:'Fredoka One',sans-serif;font-size:.78rem;color:var(--ink);
+  transition:transform .15s,background .2s,border-color .2s}
+.assistant-chip:hover{transform:translateY(-1px);background:#fff}
+.assistant-chip:active{transform:scale(.94)}
+.assistant-chip svg{height:1em;width:auto;display:block;flex:0 0 auto}
+.assistant-chip.fire{border-color:#ffd2cd;background:#fff1ef;color:#c0392b}
+.assistant-chip.fire:hover{background:#ffe6e2}
+@media(max-width:720px){
+  .assistant-btn{bottom:14px;right:12px;padding:10px 15px;font-size:.85rem}
+  .assistant-card{right:12px;bottom:70px;width:min(324px,calc(100vw - 24px))}
+  .assistant-text{max-height:130px}
 }
-.music-toggle-btn:active {
-  transform: scale(0.92);
-}
-@media (prefers-reduced-motion: reduce) {
-  .music-toggle-btn { transition: none; }
+@media(prefers-reduced-motion:reduce){
+  .assistant-btn,.assistant-card,.assistant-chip{transition:none}
+  .assistant-eq i,.assistant-card.speaking .assistant-avatar,.assistant-card.happy .assistant-avatar{animation:none}
+  .assistant-eq i{height:70%}
 }
 </style>
 </head>
@@ -601,14 +650,48 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
 <div class="cursor-ring2"  id="cursor-ring2"></div>
 <span class="cursor-label" id="cursor-label"></span>
 
-<!-- Music Toggle Button -->
-<button id="musicToggleBtn" class="music-toggle-btn" aria-label="Toggle background music">🔇</button>
+<!-- Hire Assistant — voice tutor -->
+<div class="assistant-card" id="assistant-card" role="region" aria-label="Pressure tutor assistant" aria-hidden="true">
+  <div class="assistant-head">
+    <div class="assistant-avatar" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="30" r="13" fill="#FFE3C9" stroke="#F2C9A0" stroke-width="1.5"/>
+        <polygon points="24,6 40,13 24,20 8,13" fill="#A04EF6"/>
+        <line x1="37" y1="15" x2="37" y2="22" stroke="#FF9F2E" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="37" cy="24" r="2" fill="#FF9F2E"/>
+        <circle cx="19" cy="29" r="4" stroke="#3B2B2B" stroke-width="1.8"/>
+        <circle cx="29" cy="29" r="4" stroke="#3B2B2B" stroke-width="1.8"/>
+        <line x1="23" y1="29" x2="25" y2="29" stroke="#3B2B2B" stroke-width="1.8"/>
+        <circle cx="19" cy="29" r="1.4" fill="#3B2B2B"/>
+        <circle cx="29" cy="29" r="1.4" fill="#3B2B2B"/>
+        <path d="M20 36q4 3 8 0" stroke="#3B2B2B" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="assistant-name">Dr. Pascal</div>
+      <div class="assistant-role">Your Pressure Tutor</div>
+    </div>
+    <div class="assistant-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="assistant-topic" id="assistant-topic">Welcome aboard!</div>
+  <div class="assistant-text" id="assistant-text" aria-live="polite"></div>
+  <div class="assistant-controls">
+    <button class="assistant-chip" id="assistant-repeat" type="button" aria-label="Repeat this explanation"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M20 2.5V7h-4.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Repeat</button>
+    <button class="assistant-chip" id="assistant-pause" type="button" aria-label="Pause voice"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="9" y1="5" x2="9" y2="19" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="15" y1="5" x2="15" y2="19" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg><span id="assistant-pause-label">Pause</span></button>
+    <button class="assistant-chip" id="assistant-treat" type="button" aria-label="Treat the assistant to a biscuit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#E8B173" stroke="#C98F52" stroke-width="1.6"/><circle cx="9" cy="9.5" r="1.3" fill="#9c6b35"/><circle cx="14.5" cy="13.5" r="1.3" fill="#9c6b35"/><circle cx="12.5" cy="8" r="1" fill="#9c6b35"/><circle cx="8.5" cy="14.5" r="1" fill="#9c6b35"/></svg>Treat Biscuit</button>
+    <button class="assistant-chip fire" id="assistant-fire" type="button">Fire Assistant</button>
+  </div>
+</div>
+<button id="assistant-btn" class="assistant-btn" type="button" aria-pressed="false">
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><polygon points="12,3 22,8 12,13 2,8" fill="currentColor"/><path d="M6.5 10.8V15c0 1.7 2.5 3 5.5 3s5.5-1.3 5.5-3v-4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+  <span id="assistant-btn-label">Hire Assistant</span>
+</button>
 
 <!-- NAV -->
 <nav class="site-nav">
   <div class="nav-inner">
-    <a href="index.html" class="nav-tab" data-page="play">🍅 Play</a>
-    <a href="learn.html"  class="nav-tab active" data-page="learn">📖 Learn</a>
+    <a href="index.html" class="nav-tab" data-page="play">Play</a>
+    <a href="learn.html"  class="nav-tab active" data-page="learn">Learn</a>
     <div class="nav-pill" aria-hidden="true"></div>
   </div>
 </nav>
@@ -666,9 +749,9 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
     <button class="btn btn-outline" type="button" onclick="document.getElementById('section-quiz').scrollIntoView({behavior:'smooth',block:'start'})">Take Quiz</button>
   </div>
   <div class="stat-badges">
-    <span class="stat-badge" id="sbadge-1">⚡ 6 Simulations</span>
-    <span class="stat-badge" id="sbadge-2">🎮 100% Interactive</span>
-    <span class="stat-badge" id="sbadge-3">📚 0% Boring</span>
+    <span class="stat-badge" id="sbadge-1"><svg class="badge-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none"><path d="M12 2l2.1 7.9L22 12l-7.9 2.1L12 22l-2.1-7.9L2 12l7.9-2.1Z" fill="#FF9F2E"/></svg>6 Simulations</span>
+    <span class="stat-badge" id="sbadge-2"><svg class="badge-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#A04EF6" stroke-width="2.4"/><circle cx="12" cy="12" r="2.4" fill="#A04EF6"/></svg>100% Interactive</span>
+    <span class="stat-badge" id="sbadge-3"><svg class="badge-icon" viewBox="0 0 24 26" aria-hidden="true" fill="none"><path d="M12 2.5a7 7 0 0 0-4 12.7c.9.7 1.5 1.6 1.5 2.5h5c0-.9.6-1.8 1.5-2.5a7 7 0 0 0-4-12.7Z" stroke="#58B368" stroke-width="2.2" stroke-linejoin="round"/><line x1="9.6" y1="21" x2="14.4" y2="21" stroke="#58B368" stroke-width="2.2" stroke-linecap="round"/><line x1="10.4" y1="24" x2="13.6" y2="24" stroke="#58B368" stroke-width="2.2" stroke-linecap="round"/></svg>0% Boring</span>
   </div>
 </div>
 
@@ -678,13 +761,13 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
   <div class="section-label">01 — Remember This?</div>
   <div class="hook-grid">
     <div class="card hook-bubble" data-hook-bubble="0">
-      <p>Do you still remember <strong>Force</strong>? 💪</p>
+      <p>Do you still remember <strong>Force</strong>?<span class="hook-icon hook-icon-force" aria-hidden="true"><svg viewBox="0 0 60 28" fill="none"><text x="2" y="21" font-family="'Fredoka One',sans-serif" font-size="19" fill="#FF9F2E">F</text><line x1="22" y1="14" x2="50" y2="14" stroke="#FF9F2E" stroke-width="3" stroke-linecap="round"/><path d="M44 7.5 51 14l-7 6.5" stroke="#FF9F2E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></p>
     </div>
     <div class="card hook-bubble" data-hook-bubble="1">
-      <p>What about <strong>Area</strong>? 📐</p>
+      <p>What about <strong>Area</strong>?<span class="hook-icon hook-icon-area" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><rect x="3" y="3" width="34" height="34" rx="5" stroke="#3E8BFA" stroke-width="2.6" fill="rgba(62,139,250,.08)"/><line x1="14.3" y1="3" x2="14.3" y2="37" stroke="#3E8BFA" stroke-width="1.6" opacity=".65"/><line x1="25.7" y1="3" x2="25.7" y2="37" stroke="#3E8BFA" stroke-width="1.6" opacity=".65"/><line x1="3" y1="14.3" x2="37" y2="14.3" stroke="#3E8BFA" stroke-width="1.6" opacity=".65"/><line x1="3" y1="25.7" x2="37" y2="25.7" stroke="#3E8BFA" stroke-width="1.6" opacity=".65"/></svg></span></p>
     </div>
   </div>
-  <div class="hook-thought" data-hook-reveal="0">What if Force and Area are <strong>BOTH</strong> involved at the same time...? 🤔</div>
+  <div class="hook-thought" data-hook-reveal="0">What if Force and Area are <strong>BOTH</strong> involved at the same time...?<span class="hook-icon hook-icon-question" aria-hidden="true"><svg viewBox="0 0 28 36" fill="none"><path d="M7 11c0-4.4 3.1-7 7-7s7 2.6 7 6.6c0 3.4-2.3 4.8-4.3 6.3-1.6 1.2-2.2 2.3-2.2 4.3" stroke="#A04EF6" stroke-width="2.8" stroke-linecap="round"/><circle cx="14.5" cy="29" r="2.4" fill="#A04EF6"/></svg></span></div>
   <div class="hook-arrow">Let's find out ↓</div>
 </section>
 
@@ -698,7 +781,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
      CARD 1 · Sharp vs Blunt
 ════════════════════════════════════════════════ -->
 <div class="card" id="card1">
-  <div class="card-title"><span class="em">💪</span> Sharp vs Blunt – What Changes?</div>
+  <div class="card-title"><span class="em" aria-hidden="true"><svg viewBox="0 0 60 28" fill="none"><text x="2" y="21" font-family="'Fredoka One',sans-serif" font-size="19" fill="#FF9F2E">F</text><line x1="22" y1="14" x2="50" y2="14" stroke="#FF9F2E" stroke-width="2.6" stroke-linecap="round"/><path d="M44 7.5 51 14l-7 6.5" stroke="#FF9F2E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Sharp vs Blunt – What Changes?</div>
 
   <svg class="sim-svg" id="knife-svg" viewBox="0 0 560 300" height="300">
     <defs>
@@ -733,11 +816,11 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
   </svg>
 
   <div class="controls">
-    <button class="btn btn-outline" onclick="setKnife('sharp')">🔪 Sharp</button>
-    <button class="btn btn-outline" onclick="setKnife('blunt')">🥄 Blunt</button>
+    <button class="btn btn-outline" onclick="setKnife('sharp')">Sharp</button>
+    <button class="btn btn-outline" onclick="setKnife('blunt')">Blunt</button>
     <button class="btn btn-primary" id="btn-push"
       onpointerdown="startPush()" onpointerup="stopPush()" onpointerleave="stopPush()">
-      Hold to PUSH ⬇
+      Hold to PUSH ↓
     </button>
   </div>
   <div class="readout">
@@ -752,7 +835,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
 
 <section class="card" id="section-types" data-section="section-types">
   <div class="section-label">03 — Types of Pressure</div>
-  <div class="card-title"><span class="em">🌍</span> Pressure Comes in Different Forms</div>
+  <div class="card-title"><span class="em" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="7" stroke="#2EC4B6" stroke-width="2.6"/><circle cx="24" cy="24" r="14" stroke="#2EC4B6" stroke-width="2.4" opacity=".55"/><circle cx="24" cy="24" r="21" stroke="#2EC4B6" stroke-width="2.2" opacity=".3"/></svg></span> Pressure Comes in Different Forms</div>
   <div class="section-theory">Depending on where and how we measure it, pressure has different names.</div>
   <div class="pressure-types-flow" id="pressure-types-flow">
     <button type="button" class="pressure-type-node active" data-type="atmospheric">Atmospheric Pressure</button>
@@ -769,7 +852,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
       <div>
         <h4 id="pressure-type-title">Atmospheric Pressure</h4>
         <p id="pressure-type-text">The weight of the entire air column above you pressing down.</p>
-        <div class="pressure-type-example" id="pressure-type-example">Why your ears pop on a plane ✈️</div>
+        <div class="pressure-type-example" id="pressure-type-example">Why your ears pop on a plane</div>
       </div>
     </div>
   </div>
@@ -787,7 +870,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
      CARD 2 · Pascal Hydraulic Lift
 ════════════════════════════════════════════════ -->
 <div class="card" id="card2">
-  <div class="card-title"><span class="em">🔵</span> Pascal's Law – Hydraulic Lift</div>
+  <div class="card-title"><span class="em" aria-hidden="true"><svg viewBox="0 0 24 28" fill="none"><path d="M12 3c4.5 6 8 9.5 8 14a8 8 0 0 1-16 0c0-4.5 3.5-8 8-14Z" stroke="#3E8BFA" stroke-width="2.4" fill="rgba(62,139,250,.12)" stroke-linejoin="round"/></svg></span> Pascal's Law – Hydraulic Lift</div>
 
   <svg class="sim-svg" id="pascal-svg" viewBox="0 0 560 310" height="310">
     <defs>
@@ -849,7 +932,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
   </svg>
 
   <div class="controls">
-    <label class="slider-label" for="pascal-slider">Push left piston ⬇</label>
+    <label class="slider-label" for="pascal-slider">Push left piston ↓</label>
     <input type="range" id="pascal-slider" min="0" max="100" value="0">
   </div>
   <div class="readout">
@@ -876,7 +959,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
      CARD 3 · Underwater Diver
 ════════════════════════════════════════════════ -->
 <div class="card" id="card3">
-  <div class="card-title"><span class="em">🤿</span> Deep Dive – Hydrostatic Pressure</div>
+  <div class="card-title"><span class="em" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none"><path d="M2 7q3-3.5 6 0t6 0t6 0t6 0" stroke="#2EC4B6" stroke-width="2.4" stroke-linecap="round"/><line x1="14" y1="13" x2="14" y2="23" stroke="#3E8BFA" stroke-width="2.4" stroke-linecap="round"/><path d="M9.5 19 14 24l4.5-5" stroke="#3E8BFA" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Deep Dive – Hydrostatic Pressure</div>
 
   <svg class="sim-svg" id="hydro-svg" viewBox="0 0 560 300" height="300">
     <defs>
@@ -954,7 +1037,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
      CARD 4 · Boyle's Law Bouncing Particles
 ════════════════════════════════════════════════ -->
 <div class="card" id="card4">
-  <div class="card-title"><span class="em">🔴</span> Boyle's Law – Squeeze the Gas</div>
+  <div class="card-title"><span class="em" aria-hidden="true"><svg viewBox="0 0 26 28" fill="none"><rect x="3" y="4" width="20" height="21" rx="4" stroke="#FF5A4E" stroke-width="2.4"/><circle cx="9" cy="11" r="1.9" fill="#FF5A4E"/><circle cx="16" cy="15" r="1.9" fill="#FF9F2E"/><circle cx="10" cy="20" r="1.9" fill="#A04EF6"/></svg></span> Boyle's Law – Squeeze the Gas</div>
 
   <svg class="sim-svg" id="boyle-svg" viewBox="0 0 560 300" height="300">
     <defs>
@@ -1030,7 +1113,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
      CARD 5 · Blood Pressure
 ════════════════════════════════════════════════ -->
 <div class="card" id="card5">
-  <div class="card-title"><span class="em">🫀</span> Blood Pressure – Feel Your Pulse</div>
+  <div class="card-title"><span class="em" aria-hidden="true"><svg viewBox="0 0 32 24" fill="none"><path d="M2 13h7l3-7 5 13 3-6h10" stroke="#FF5A4E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Blood Pressure – Feel Your Pulse</div>
 
   <svg class="sim-svg" id="bp-svg" viewBox="0 0 560 280" height="280">
     <defs>
@@ -1048,7 +1131,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
     <g id="heart-group" transform="translate(110,130)" cursor="pointer" style="user-select:none">
       <path d="M0,-20 C20,-50 55,-35 55,0 C55,30 25,55 0,75 C-25,55 -55,30 -55,0 C-55,-35 -20,-50 0,-20Z"
         fill="#FF5A4E" filter="url(#glow-red)"/>
-      <text x="0" y="15" text-anchor="middle" font-size="22">❤️</text>
+      <path d="M-9 -2 L-4 -2 L-1 -8 L3 6 L6 0 L11 0" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(0,12)"/>
       <text x="0" y="95" text-anchor="middle" font-family="Fredoka One" font-size="12" fill="#FF5A4E">Click to beat!</text>
     </g>
     <!-- artery -->
@@ -1069,7 +1152,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
   </svg>
 
   <div class="controls">
-    <button class="btn btn-primary" onclick="triggerHeartbeat()">💓 Beat</button>
+    <button class="btn btn-primary" onclick="triggerHeartbeat()">Beat</button>
     <label class="slider-label" for="stress-slider">Stress level:</label>
     <input type="range" id="stress-slider" min="0" max="100" value="0">
   </div>
@@ -1084,7 +1167,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
 
 <section class="card" id="section-apps" data-section="section-apps">
   <div class="section-label">08 — Real World</div>
-  <div class="card-title"><span class="em">🧰</span> Real World Applications</div>
+  <div class="card-title"><span class="em" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="5" stroke="#FF9F2E" stroke-width="2.4"/><g stroke="#FF9F2E" stroke-width="2.4" stroke-linecap="round"><line x1="14" y1="2.5" x2="14" y2="6"/><line x1="14" y1="22" x2="14" y2="25.5"/><line x1="2.5" y1="14" x2="6" y2="14"/><line x1="22" y1="14" x2="25.5" y2="14"/><line x1="5.9" y1="5.9" x2="8.4" y2="8.4"/><line x1="19.6" y1="19.6" x2="22.1" y2="22.1"/><line x1="5.9" y1="22.1" x2="8.4" y2="19.6"/><line x1="19.6" y1="8.4" x2="22.1" y2="5.9"/></g></svg></span> Real World Applications</div>
   <div class="section-theory">Pressure shows up everywhere in daily life, from cutting tools and car tyres to breathing, building machines, and moving vehicles.</div>
   <div class="app-grid">
     <div class="app-card"><h4>Sharp Tools</h4><p>Needles and blades use tiny areas to increase pressure.</p></div>
@@ -1098,7 +1181,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
 
 <section class="card" id="section-quiz" data-section="section-quiz">
   <div class="section-label">09 — Knowledge Check</div>
-  <div class="card-title"><span class="em">🎯</span> Quiz Challenge</div>
+  <div class="card-title"><span class="em" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="9" stroke="#A04EF6" stroke-width="2.4"/><circle cx="14" cy="14" r="2.3" fill="#A04EF6"/><g stroke="#A04EF6" stroke-width="2.4" stroke-linecap="round"><line x1="14" y1="1.5" x2="14" y2="6"/><line x1="14" y1="22" x2="14" y2="26.5"/><line x1="1.5" y1="14" x2="6" y2="14"/><line x1="22" y1="14" x2="26.5" y2="14"/></g></svg></span> Quiz Challenge</div>
   <div class="quiz-container" id="quiz-container">
     <div class="quiz-top">
       <div class="quiz-meta quiz-meta-q">Question 1 of 7</div>
@@ -1136,7 +1219,7 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
      CARD 6 · Rocket Launch
 ════════════════════════════════════════════════ -->
 <div class="card" id="card6">
-  <div class="card-title"><span class="em">🚀</span> Rocket Launch – Pressure Powers Space!</div>
+  <div class="card-title"><span class="em" aria-hidden="true"><svg viewBox="0 0 24 28" fill="none"><line x1="12" y1="25" x2="12" y2="6" stroke="#58B368" stroke-width="2.6" stroke-linecap="round"/><path d="M6 11.5 12 4.5l6 7" stroke="#58B368" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="22" x2="5" y2="17" stroke="#FF9F2E" stroke-width="2.2" stroke-linecap="round" opacity=".6"/><line x1="19" y1="22" x2="19" y2="17" stroke="#FF9F2E" stroke-width="2.2" stroke-linecap="round" opacity=".6"/></svg></span> Rocket Launch – Pressure Powers Space!</div>
 
   <svg class="sim-svg" id="rocket-svg" viewBox="0 0 560 320" height="320">
     <!-- night sky -->
@@ -1210,18 +1293,18 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
     <!-- liftoff badge -->
     <g id="liftoff-badge" opacity="0">
       <rect x="28" y="82" width="370" height="60" rx="12" fill="#0d2a1a" stroke="#58B368" stroke-width="2"/>
-      <text x="213" y="108" text-anchor="middle" font-family="Fredoka One" font-size="12" fill="#58B368">🚀 Liftoff at 28,000 km/h!</text>
+      <text x="213" y="108" text-anchor="middle" font-family="Fredoka One" font-size="12" fill="#58B368">Liftoff at 28,000 km/h!</text>
       <text x="213" y="130" text-anchor="middle" font-family="Nunito" font-size="9.5" fill="#88ee88">Pressure from burning fuel powers the rocket up!</text>
     </g>
   </svg>
 
   <div class="controls">
-    <button class="btn btn-primary" id="btn-ignite" onclick="igniteRocket()">🔥 IGNITE</button>
-    <button class="btn btn-outline"  id="btn-rocket-reset" onclick="resetRocket()" style="display:none">🔄 Reset</button>
+    <button class="btn btn-primary" id="btn-ignite" onclick="igniteRocket()">IGNITE</button>
+    <button class="btn btn-outline"  id="btn-rocket-reset" onclick="resetRocket()" style="display:none">Reset</button>
     <div class="chip chip-p" style="margin-left:8px">Thrust: <span id="c6-thrust">0</span> N</div>
   </div>
   <div class="insight" id="ins6">
-    <div class="insight-pill">Burning fuel creates massive pressure — nowhere to go but DOWN, so the rocket goes UP! 🚀</div>
+    <div class="insight-pill">Burning fuel creates massive pressure — nowhere to go but DOWN, so the rocket goes UP!</div>
   </div>
 </div>
 
@@ -1332,25 +1415,25 @@ function initPressureTypes(){
     atmospheric: {
       title: 'Atmospheric Pressure',
       text: 'The weight of the entire air column above you pressing down.',
-      example: 'Why your ears pop on a plane ✈️',
+      example: 'Why your ears pop on a plane',
       svg: '<svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true"><rect x="0" y="0" width="180" height="180" rx="18" fill="#FFF6E9"></rect><path d="M20 28 C55 12, 125 12, 160 28 L160 55 C124 38, 56 38, 20 55 Z" fill="#cce8ff" opacity=".9"></path><path d="M24 58 C58 42, 122 42, 156 58" stroke="#3E8BFA" stroke-width="3" stroke-dasharray="7 7" fill="none"></path><circle cx="88" cy="113" r="16" fill="#FFD97D"></circle><rect x="81" y="129" width="14" height="18" rx="6" fill="#5c3d2e"></rect><line x1="88" y1="74" x2="88" y2="98" stroke="#FF9F2E" stroke-width="4" marker-end="url(#atmo-arrow)"></line><defs><marker id="atmo-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#FF9F2E"></polygon></marker></defs></svg>'
     },
     gauge: {
       title: 'Gauge Pressure',
       text: 'Pressure measured above atmospheric pressure.',
-      example: 'Your car tyre shows gauge pressure — add 14.7 psi for absolute 🚗',
+      example: 'Your car tyre shows gauge pressure — add 14.7 psi for absolute',
       svg: '<svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true"><rect x="0" y="0" width="180" height="180" rx="18" fill="#FFF6E9"></rect><circle cx="90" cy="96" r="48" fill="#fff" stroke="#E0D0C0" stroke-width="4"></circle><circle cx="90" cy="96" r="34" fill="#F8F0E8" stroke="#E0D0C0" stroke-width="2"></circle><line x1="90" y1="96" x2="124" y2="72" stroke="#FF9F2E" stroke-width="5" stroke-linecap="round"></line><circle cx="90" cy="96" r="6" fill="#A04EF6"></circle><rect x="80" y="35" width="20" height="30" rx="6" fill="#5c3d2e"></rect></svg>'
     },
     absolute: {
       title: 'Absolute Pressure',
       text: 'Total pressure measured from absolute zero (perfect vacuum).',
-      example: 'Used in Boyle\'s Law calculations 🔬',
+      example: 'Used in Boyle\'s Law calculations',
       svg: '<svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true"><rect x="0" y="0" width="180" height="180" rx="18" fill="#FFF6E9"></rect><rect x="42" y="44" width="96" height="92" rx="22" fill="#fff" stroke="#F2E3CC" stroke-width="4"></rect><rect x="62" y="64" width="56" height="52" rx="14" fill="#1a1a2e"></rect><line x1="90" y1="64" x2="90" y2="42" stroke="#FF5A4E" stroke-width="5" marker-end="url(#abs-arrow)"></line><defs><marker id="abs-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#FF5A4E"></polygon></marker></defs></svg>'
     },
     differential: {
       title: 'Differential Pressure',
       text: 'The difference in pressure between two points.',
-      example: 'How aircraft speed sensors (pitot tubes) work ✈️',
+      example: 'How aircraft speed sensors (pitot tubes) work',
       svg: '<svg viewBox="0 0 180 180" width="180" height="180" aria-hidden="true"><rect x="0" y="0" width="180" height="180" rx="18" fill="#FFF6E9"></rect><rect x="26" y="70" width="44" height="70" rx="12" fill="#cde8ff" stroke="#3E8BFA" stroke-width="3"></rect><rect x="110" y="52" width="44" height="88" rx="12" fill="#e6ffe6" stroke="#58B368" stroke-width="3"></rect><line x1="70" y1="105" x2="110" y2="98" stroke="#FF9F2E" stroke-width="5" marker-end="url(#diff-arrow)"></line><defs><marker id="diff-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#FF9F2E"></polygon></marker></defs></svg>'
     }
   };
@@ -1864,6 +1947,8 @@ let journeyBubbleTimer = null;
 function igniteRocket(){
   if(rocketLaunched) return;
   rocketLaunched = true;
+  // launch owns the stage: silences assistant + meter narration until landing
+  if(window.VoiceArbiter) window.VoiceArbiter.beginActivity('rocket');
   document.getElementById('btn-ignite').style.display = 'none';
   document.getElementById('btn-rocket-reset').style.display = '';
   showInsight('ins6');
@@ -1949,12 +2034,12 @@ function igniteRocket(){
 /* PHASES 3–6 — overlay rocket leaves the box, teaches pressure on the way
    to the hero section, says goodbye, flies back and lands on the pad */
 const JOURNEY_BUBBLES = [
-  '🚀 Fuel burns inside the rocket engine!',
-  '🔥 Burning fuel creates very hot gases!',
-  '💨 The hot gases get squeezed and create HIGH pressure!',
-  '⬇️ High-pressure gases rush downward through the nozzle!',
-  '⚡ When gases push DOWN, the rocket gets pushed UP!',
-  "🚀 That's pressure in action!"
+  'Fuel burns inside the rocket engine!',
+  'Burning fuel creates very hot gases!',
+  'The hot gases get squeezed and create HIGH pressure!',
+  'High-pressure gases rush downward through the nozzle!',
+  'When gases push DOWN, the rocket gets pushed UP!',
+  "That's pressure in action!"
 ];
 
 function startRocketJourney(rocketGrp, flames){
@@ -2076,7 +2161,7 @@ function startRocketJourney(rocketGrp, flames){
       if(tick%5===0) puff(0.4);
       if(phase==='hover' && el>=T_HOVER){
         phase='bye'; phaseStart=now;
-        setBubble('💬 Bye! Keep exploring pressure! 🚀');
+        setBubble('Bye! Keep exploring pressure!');
         if(window.soundFX) window.soundFX.playCorrectSound();
       } else if(phase==='bye' && el>=T_BYE){
         phase='flip'; phaseStart=now; setBubble(null);
@@ -2161,6 +2246,8 @@ function resetRocket(){
   rocketLaunched=false;
   cancelAnimationFrame(rocketRAF);
   endRocketJourney();
+  // launch is over (landed or reset) — lower-priority narrators may resume
+  if(window.VoiceArbiter) window.VoiceArbiter.endActivity('rocket');
   if (window.soundFX) {
     window.soundFX.stopRocketSound();
     window.soundFX.tone({ frequency: 200, slideTo: 40, duration: 0.3, type: 'sine', gain: 0.055 });
@@ -2186,6 +2273,51 @@ function resetRocket(){
   if(ins) ins.classList.remove('visible');
 }
 
+
+/* ══════════════════════════════════
+   VOICE ARBITER — one narrator at a time
+   priority: rocket (3) > assistant (2) > meter (1)
+══════════════════════════════════ */
+window.VoiceArbiter = (function(){
+  const PRIORITY = { rocket: 3, assistant: 2, meter: 1 };
+  const blockers = new Set();   // running activities that silence lower voices (rocket launch)
+  const listeners = {};
+  let owner = null;             // narration owner — the assistant while hired
+  let speakingSource = null;
+
+  function cancelAll(){
+    if('speechSynthesis' in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  }
+  function canSpeak(source){
+    const p = PRIORITY[source] || 0;
+    for(const b of blockers) if(PRIORITY[b] > p) return false;
+    if(owner && owner !== source && p < PRIORITY[owner]) return false;
+    return true;
+  }
+  // every narration goes through here — guarantees a cancel() before speaking
+  function request(source){
+    if(!canSpeak(source)) return false;
+    cancelAll();
+    speakingSource = source;
+    return true;
+  }
+  function release(source){ if(speakingSource === source) speakingSource = null; }
+  function setOwner(name){ owner = name; cancelAll(); }
+  function clearOwner(name){ if(owner === name) owner = null; }
+  function on(evt, fn){ (listeners[evt] = listeners[evt] || []).push(fn); }
+  function emit(evt){ (listeners[evt] || []).forEach(fn => { try{ fn(); }catch(e){} }); }
+  function beginActivity(name){
+    if(blockers.has(name)) return;
+    blockers.add(name);
+    cancelAll();                // a higher-priority source takes the stage immediately
+    emit(name + ':start');
+  }
+  function endActivity(name){
+    if(blockers.delete(name)) emit(name + ':end');
+  }
+  return { canSpeak, request, release, setOwner, clearOwner, beginActivity, endActivity, on,
+           isActive: name => blockers.has(name) };
+})();
 
 /* ══════════════════════════════════
    SCROLL ANIMATIONS
@@ -2232,8 +2364,10 @@ function resetRocket(){
   function pemSpeak(lvl){
     if(!('speechSynthesis' in window)) return;
     if(window.soundFX && window.soundFX.isMuted()) return;
+    // meter is the lowest-priority narrator: silent while the assistant is
+    // hired or a rocket launch is running (request() also cancels any speech)
+    if(window.VoiceArbiter && !window.VoiceArbiter.request('meter')) return;
     try{
-      window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(lvl.title + '. ' + lvl.msg);
       u.rate = 1; u.pitch = 1; u.volume = .9;
       window.speechSynthesis.speak(u);
@@ -2291,6 +2425,12 @@ function resetRocket(){
       pemSR.textContent    = lvl.title + '. ' + pressure + ' pascals.';
       if(pemLastLvl !== -1) pemSpeak(lvl);   // no narration on initial load
       pemLastLvl = idx;
+      // publish meter state so the assistant can teach with it
+      window.pemState = {
+        pressure, level: lvl.title,
+        band: idx <= 1 ? 'low' : idx <= 3 ? 'medium' : idx <= 5 ? 'heavy' : 'extreme'
+      };
+      document.dispatchEvent(new CustomEvent('pem:levelchange', { detail: window.pemState }));
     }
 
     if(pemOpen) pemUpdateCard(pressure, t, LEVELS[idx]);
@@ -2394,15 +2534,41 @@ function resetRocket(){
    DECORATIVE JS
 ══════════════════════════════════ */
 (function(){
-  // 1 — floating physics symbols
-  const SYMS=['⚡','🔬','⚗️','💧','🌊','🔵','⚡','🔬','⚗️','💧','🌊','🔵'];
+  // 1 — floating physics doodles (vector: force arrows, grids, rings, rulers…)
+  const SYMS=[
+    // force arrow
+    '<svg viewBox="0 0 48 24" fill="none"><line x1="4" y1="12" x2="36" y2="12" stroke="#FF9F2E" stroke-width="3" stroke-linecap="round"/><path d="M29 4.5 37.5 12 29 19.5" stroke="#FF9F2E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    // F vector
+    '<svg viewBox="0 0 60 28" fill="none"><text x="2" y="21" font-family="Fredoka One, sans-serif" font-size="19" fill="#FF9F2E">F</text><line x1="22" y1="14" x2="50" y2="14" stroke="#FF9F2E" stroke-width="2.6" stroke-linecap="round"/><path d="M44 7.5 51 14l-7 6.5" stroke="#FF9F2E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    // concentric pressure rings
+    '<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="7" stroke="#A04EF6" stroke-width="2.4"/><circle cx="24" cy="24" r="14" stroke="#A04EF6" stroke-width="2.2" opacity=".55"/><circle cx="24" cy="24" r="21" stroke="#A04EF6" stroke-width="2" opacity=".3"/></svg>',
+    // area grid
+    '<svg viewBox="0 0 40 40" fill="none"><rect x="2" y="2" width="36" height="36" rx="5" stroke="#3E8BFA" stroke-width="2.4"/><line x1="14" y1="2" x2="14" y2="38" stroke="#3E8BFA" stroke-width="1.6" opacity=".7"/><line x1="26" y1="2" x2="26" y2="38" stroke="#3E8BFA" stroke-width="1.6" opacity=".7"/><line x1="2" y1="14" x2="38" y2="14" stroke="#3E8BFA" stroke-width="1.6" opacity=".7"/><line x1="2" y1="26" x2="38" y2="26" stroke="#3E8BFA" stroke-width="1.6" opacity=".7"/></svg>',
+    // measurement ruler
+    '<svg viewBox="0 0 60 22" fill="none"><rect x="2" y="3" width="56" height="16" rx="4" stroke="#58B368" stroke-width="2.4"/><g stroke="#58B368" stroke-width="1.8" opacity=".8"><line x1="12" y1="3" x2="12" y2="10"/><line x1="22" y1="3" x2="22" y2="13"/><line x1="32" y1="3" x2="32" y2="10"/><line x1="42" y1="3" x2="42" y2="13"/><line x1="52" y1="3" x2="52" y2="10"/></g></svg>',
+    // pressure wave ripple
+    '<svg viewBox="0 0 44 30" fill="none"><g stroke="#2EC4B6" stroke-linecap="round"><path d="M14 24a8 8 0 0 1 16 0" stroke-width="2.4"/><path d="M8 26a14 14 0 0 1 28 0" stroke-width="2.2" opacity=".55"/><path d="M2 28a20 20 0 0 1 40 0" stroke-width="2" opacity=".3"/></g></svg>',
+    // particle dots
+    '<svg viewBox="0 0 36 36" fill="none"><circle cx="9" cy="22" r="3" fill="#A04EF6"/><circle cx="22" cy="9" r="2.5" fill="#3E8BFA"/><circle cx="29" cy="25" r="2" fill="#FF9F2E"/><circle cx="17" cy="30" r="1.8" fill="#58B368"/></svg>',
+    // curiosity question mark
+    '<svg viewBox="0 0 28 36" fill="none"><path d="M7 11c0-4.4 3.1-7 7-7s7 2.6 7 6.6c0 3.4-2.3 4.8-4.3 6.3-1.6 1.2-2.2 2.3-2.2 4.3" stroke="#A04EF6" stroke-width="2.6" stroke-linecap="round"/><circle cx="14.5" cy="29" r="2.2" fill="#A04EF6"/></svg>',
+    // formula doodle
+    '<svg viewBox="0 0 64 30" fill="none"><text x="2" y="22" font-family="Fredoka One, sans-serif" font-size="16" fill="#58B368">P = F/A</text></svg>',
+    // motion streaks
+    '<svg viewBox="0 0 48 24" fill="none"><g stroke="#3E8BFA" stroke-width="2.6" stroke-linecap="round"><line x1="6" y1="6" x2="26" y2="6"/><line x1="2" y1="13" x2="34" y2="13" opacity=".65"/><line x1="8" y1="20" x2="22" y2="20" opacity=".4"/></g></svg>',
+    // precision crosshair
+    '<svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="11" stroke="#FF5A4E" stroke-width="2.4"/><circle cx="18" cy="18" r="2.4" fill="#FF5A4E"/><g stroke="#FF5A4E" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="2" x2="18" y2="8"/><line x1="18" y1="28" x2="18" y2="34"/><line x1="2" y1="18" x2="8" y2="18"/><line x1="28" y1="18" x2="34" y2="18"/></g></svg>',
+    // discovery lightbulb
+    '<svg viewBox="0 0 28 36" fill="none"><path d="M14 3a9 9 0 0 0-5.2 16.3c1.2.9 1.9 2 1.9 3.2h6.6c0-1.2.7-2.3 1.9-3.2A9 9 0 0 0 14 3Z" stroke="#FF9F2E" stroke-width="2.4" stroke-linejoin="round"/><line x1="10.5" y1="27" x2="17.5" y2="27" stroke="#FF9F2E" stroke-width="2.4" stroke-linecap="round"/><line x1="11.5" y1="31" x2="16.5" y2="31" stroke="#FF9F2E" stroke-width="2.4" stroke-linecap="round"/></svg>'
+  ];
   if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
     SYMS.forEach(sym=>{
       const el=document.createElement('span');
       el.className='float-sym';
-      el.textContent=sym;
-      const size=20+Math.random()*20;
-      el.style.cssText=`font-size:${size}px;left:${Math.random()*95}%;`+
+      el.innerHTML=sym;
+      el.setAttribute('aria-hidden','true');
+      const size=26+Math.random()*26;
+      el.style.cssText=`width:${size}px;left:${Math.random()*95}%;`+
         `--dur:${10+Math.random()*10}s;--delay:-${Math.random()*14}s;`+
         `--drift:${(Math.random()-.5)*80}px`;
       document.body.appendChild(el);
@@ -2579,25 +2745,6 @@ function resetRocket(){
   let rocketNoise = null;
   let rocketFilter = null;
   let rocketGain = null;
-  let musicPlaying = false;
-  let sequencerInterval = null;
-  let sequencerStep = 0;
-
-  const SCALE = {
-    C3: 130.81, D3: 146.83, E3: 164.81, G3: 196.00, A3: 220.00,
-    C4: 261.63, D4: 293.66, E4: 329.63, G4: 392.00, A4: 440.00,
-    C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880.00
-  };
-
-  const BASS_PATTERN = [
-    'C3', null, 'G3', null, 'C3', null, 'G3', null,
-    'A3', null, 'E3', null, 'F3', null, 'C4', null
-  ];
-
-  const MELODY_PATTERN = [
-    'E4', 'G4', 'C5', null, 'D5', 'C5', 'G4', null,
-    'A4', 'C5', 'E5', 'D5', 'C5', null, 'G4', null
-  ];
 
   function getAudioContext() {
     const Ctor = window.AudioContext || window.webkitAudioContext;
@@ -2611,91 +2758,6 @@ function resetRocket(){
     const ctx = getAudioContext();
     if (!ctx || ctx.state === 'running') return;
     ctx.resume().catch(() => {});
-    
-    // Auto-start music if preference is not 'off'
-    if (localStorage.getItem('pressurePlaygroundMusic') !== 'off') {
-      startBackgroundMusic();
-      const btn = document.getElementById('musicToggleBtn');
-      if (btn) btn.textContent = '🎵';
-    }
-  }
-
-  function playSequencerStep() {
-    const ctx = getAudioContext();
-    if (!ctx || !musicPlaying) return;
-
-    const time = ctx.currentTime;
-    const step = sequencerStep % 16;
-    
-    const bassNote = BASS_PATTERN[step];
-    const melodyNote = MELODY_PATTERN[step];
-
-    if (bassNote && SCALE[bassNote]) {
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(SCALE[bassNote], time);
-      
-      gainNode.gain.setValueAtTime(0.0001, time);
-      gainNode.gain.exponentialRampToValueAtTime(0.012, time + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.0001, time + 0.28);
-      
-      osc.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      osc.start(time);
-      osc.stop(time + 0.3);
-    }
-
-    if (melodyNote && SCALE[melodyNote]) {
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(SCALE[melodyNote], time);
-      
-      gainNode.gain.setValueAtTime(0.0001, time);
-      gainNode.gain.exponentialRampToValueAtTime(0.006, time + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.0001, time + 0.16);
-      
-      osc.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      osc.start(time);
-      osc.stop(time + 0.18);
-    }
-
-    sequencerStep++;
-  }
-
-  function startBackgroundMusic() {
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    if (sequencerInterval) return;
-
-    musicPlaying = true;
-    sequencerStep = 0;
-    sequencerInterval = setInterval(playSequencerStep, 150);
-  }
-
-  function stopBackgroundMusic() {
-    musicPlaying = false;
-    if (sequencerInterval) {
-      clearInterval(sequencerInterval);
-      sequencerInterval = null;
-    }
-  }
-
-  function toggleMusic() {
-    const btn = document.getElementById('musicToggleBtn');
-    if (!btn) return;
-    const ctx = getAudioContext();
-    if (musicPlaying) {
-      stopBackgroundMusic();
-      btn.textContent = '🔇';
-      localStorage.setItem('pressurePlaygroundMusic', 'off');
-    } else {
-      startBackgroundMusic();
-      btn.textContent = '🎵';
-      localStorage.setItem('pressurePlaygroundMusic', 'on');
-    }
   }
 
   // master bus — every sound routes through this so mute controls everything
@@ -3208,9 +3270,6 @@ function resetRocket(){
     playRocketSound,
     updateRocketSound,
     stopRocketSound,
-    toggleMusic,
-    startBackgroundMusic,
-    stopBackgroundMusic,
     setMuted,
     isMuted: () => muted
   };
@@ -3340,7 +3399,7 @@ function resetRocket(){
       feedbackBox.classList.remove('fb-show', 'fb-correct', 'fb-wrong');
       feedbackBox.textContent = '';
       nextBtn.classList.remove('nb-show');
-      nextBtn.textContent = index < QUIZ_DATA.length - 1 ? 'Next Question →' : 'See Results 🎉';
+      nextBtn.textContent = index < QUIZ_DATA.length - 1 ? 'Next Question →' : 'See Results';
     }
 
     function selectAnswer(chosenIndex, chosenBtn) {
@@ -3353,13 +3412,13 @@ function resetRocket(){
       if (chosenIndex === data.ans) {
         score++;
         chosenBtn.classList.add('opt-correct');
-        feedbackBox.textContent = '✅ Correct! ' + data.explain;
+        feedbackBox.textContent = 'Correct! ' + data.explain;
         feedbackBox.className = 'feedback-box fb-show fb-correct';
         playCorrectSound();
       } else {
         chosenBtn.classList.add('opt-wrong');
         allOpts[data.ans].classList.add('opt-correct');
-        feedbackBox.textContent = '❌ Not quite. ' + data.explain;
+        feedbackBox.textContent = 'Not quite. ' + data.explain;
         feedbackBox.className = 'feedback-box fb-show fb-wrong';
         playWrongSound();
       }
@@ -3381,7 +3440,7 @@ function resetRocket(){
         playQuizComplete();
         progressFill.style.width = '100%';
         resultsScore.textContent = `${score} / ${QUIZ_DATA.length}`;
-        resultsMsg.textContent = score >= 6 ? '🏆 Outstanding! You are a pressure expert!' : score >= 4 ? '🎉 Great job! A little more practice and you’ll nail it.' : score >= 2 ? '📖 Good try! Re-read the sections and try again.' : '💪 Keep going! Every attempt makes you smarter.';
+        resultsMsg.textContent = score >= 6 ? 'Outstanding! You are a pressure expert!' : score >= 4 ? 'Great job! A little more practice and you’ll nail it.' : score >= 2 ? 'Good try! Re-read the sections and try again.' : 'Keep going! Every attempt makes you smarter.';
       } else {
         loadQuestion(current);
       }
@@ -3399,19 +3458,463 @@ function resetRocket(){
   }
 
   initQuiz();
+})();
 
-  // Initialize background music
-  (function initMusic() {
-    const btn = document.getElementById('musicToggleBtn');
-    if (!btn) return;
-    const pref = localStorage.getItem('pressurePlaygroundMusic');
-    if (pref === 'on' || pref === null) {
-      btn.textContent = '🎵';
-    } else {
-      btn.textContent = '🔇';
+/* ══════════════════════════════════
+   HIRE ASSISTANT — voice tutor
+══════════════════════════════════ */
+(function(){
+  const btn       = document.getElementById('assistant-btn');
+  const btnLabel  = document.getElementById('assistant-btn-label');
+  const card      = document.getElementById('assistant-card');
+  const topicEl   = document.getElementById('assistant-topic');
+  const textEl    = document.getElementById('assistant-text');
+  const repeatBtn = document.getElementById('assistant-repeat');
+  const pauseBtn  = document.getElementById('assistant-pause');
+  const pauseLbl  = document.getElementById('assistant-pause-label');
+  const treatBtn  = document.getElementById('assistant-treat');
+  const fireBtn   = document.getElementById('assistant-fire');
+  if(!btn || !card) return;
+
+  const synth = window.speechSynthesis || null;
+  const arbiter = window.VoiceArbiter || null;
+
+  const GREETING   = "Congratulations, you hired me! I'll guide you through pressure concepts as you explore. Keep an eye on the pressure meter on the top-right — we'll use it together as we learn.";
+  const TREAT_LINE = "Thank you! I love these. I'm fully recharged and ready to help you learn even more.";
+  const ROCKET_RESUME = "Rocket launch completed. Let's continue exploring pressure.";
+  const REVISIT_MS = 120000;   // re-explain a section when revisited after 2 minutes
+
+  // standalone explanations when the meter crosses into a new pressure range
+  const BAND_EXPLAIN = {
+    low:     "As you can see on the pressure meter on the top-right, we're currently at a low pressure level. This is similar to the weight of a few sheets of paper resting on your hand, so the meter remains calm.",
+    medium:  "The pressure meter on the top-right is now entering a stronger range. This is comparable to carrying a loaded backpack. Notice how the meter is becoming more active.",
+    heavy:   "The pressure meter on the top-right is showing heavy pressure. This is similar to a completely full bucket of water pushing downward. That's why the meter is shaking more.",
+    extreme: "We are now approaching extreme pressure. Imagine several full buckets stacked above you. Notice how intensely the meter reacts to demonstrate how powerful pressure can become."
+  };
+  // shorter versions woven into a section explanation when the range is still new
+  const BAND_CONTEXT = {
+    low:     "As you can see on the pressure meter on the top-right, we're still at a low pressure level — about the weight of a few sheets of paper — so the meter stays calm.",
+    medium:  "Take a quick look at the pressure meter on the top-right: it has entered a stronger range, comparable to carrying a loaded backpack, which is why it's becoming more active.",
+    heavy:   "Notice the pressure meter on the top-right — it's showing heavy pressure now, like a completely full bucket of water pushing downward. That's why the ring is shaking more.",
+    extreme: "And look at the pressure meter on the top-right — we're approaching extreme pressure, like several full buckets stacked above you. That's why the meter is reacting so intensely."
+  };
+
+  const LESSONS = {
+    'section-hook': {
+      title: 'Force & Area — The Building Blocks',
+      text: "Let's warm up with two ideas you already know. A force is a push or a pull — press your thumb on a drawing pin and you're applying one. An area is the amount of surface that push spreads over. Hold on to both, because the question on your screen is exactly the right one to ask: what happens when force and area work together? That's where pressure is born."
+    },
+    'section-pressure': {
+      title: 'Pressure = Force ÷ Area',
+      text: "Pause here, because this is the key idea of the whole lesson. Look at the formula on your screen: pressure equals force divided by area. Same force on a smaller area means bigger pressure. That is why a sharp pin pierces paper easily, but a flat coin cannot. In the knife demo just below, try it yourself — hold the push button with each knife and compare the pressure values you get."
+    },
+    'section-types': {
+      title: 'The Four Types of Pressure',
+      text: "Now, pressure wears different names depending on what we compare it to. As you can see on your screen, there are four. Atmospheric pressure is the weight of the air above you — the reason your ears pop in an aeroplane. Gauge pressure is measured above atmospheric, like a tyre gauge reading. Absolute pressure counts from a perfect vacuum, and differential pressure is the difference between two points — that is how aircraft measure their speed. Click each bubble and look at the real-life example that appears."
+    },
+    'section-pascal': {
+      title: "Pascal's Law — The Power of Fluids",
+      text: "This simulation is one of my favourites. Pascal's Law says that when you squeeze a trapped fluid, the pressure spreads equally in every direction. Now try moving the slider below and look carefully: as the small piston pushes down, the very same pressure appears under the large piston — and because it acts on a bigger area, it lifts the whole car. That is exactly how a mechanic raises a car with one hand."
+    },
+    'section-underwater': {
+      title: 'Hydrostatic Pressure — Deeper Means Stronger',
+      text: "Let's dive. Under water, pressure grows with depth, because every metre of water above you adds its weight. Drag the depth slider slowly and watch the diver — just ten metres down, the pressure has already roughly doubled. Notice the diver's face as you go deeper! This is why your ears hurt at the bottom of a swimming pool, and why submarines need thick steel hulls."
+    },
+    'section-boyle': {
+      title: "Boyle's Law — Squeeze a Gas",
+      text: "Here is Boyle's Law, live on your screen. Try dragging the brown piston to the left and watch the gas particles carefully — with less space, they hit the walls more often, so the pressure gauge climbs. Squeeze the gas into half the space and the pressure doubles, as long as the temperature stays the same. You can feel this at home: block the end of a bicycle pump and push — the trapped air pushes back harder and harder."
+    },
+    'section-blood': {
+      title: "Blood Pressure — Your Body's Pump",
+      text: "Your heart is a pump that creates pressure to push blood around your body. Press the Beat button and watch the pulse travel along the artery on your screen. A reading has two numbers: systolic, when the heart squeezes, and diastolic, when it relaxes between beats. Now try raising the stress slider and notice what happens to those numbers — that is why doctors keep such a close eye on stress."
+    },
+    'section-apps': {
+      title: 'Pressure in the Real World',
+      text: "Pause here for a moment and look at these cards — every one of them is the same idea wearing a different costume. Needles and knives concentrate force onto tiny areas. Tyres hold air at just the right pressure to carry a whole car. Hydraulic brakes turn a light press of your foot into a powerful stop. And rockets fly because high-pressure gas rushes downward, pushing the rocket up. Once you can spot pressure, you will see it everywhere."
+    },
+    'section-quiz': {
+      title: 'Quiz Time — Show What You Know',
+      text: "Time to show what you know. Read each question slowly and picture the simulations you just explored: smaller area means more pressure, deeper water means more pressure, and squeezing a gas raises its pressure. Use the hints if you get stuck — a wrong answer you learn from is worth more than a lucky guess. Good luck, I'm right here with you."
     }
-    btn.addEventListener('click', toggleMusic);
-  })();
+  };
+
+  let hired = false;
+  let justHired = false;       // queue the first auto-explanation behind the greeting
+  let currentId = null;        // section currently shown on the card
+  let paused = false;
+  let voice = null;
+  let io = null;
+  let happyTimer = 0;
+  let spokenAt = Object.create(null);      // section id → time it was last voiced
+  let bandsExplained = new Set();          // pressure ranges already covered this hire
+  let lastBand = null;
+
+  function pickVoice(){
+    if(!synth) return;
+    const voices = synth.getVoices();
+    if(!voices.length) return;
+    const prefs = [
+      /Google UK English Female/i,
+      /Microsoft (Aria|Jenny|Sonia|Libby)/i,
+      /Google US English/i,
+      /Samantha/i,
+      /Microsoft Zira/i
+    ];
+    for(const p of prefs){
+      const v = voices.find(v => p.test(v.name));
+      if(v){ voice = v; return; }
+    }
+    voice = voices.find(v => /^en[-_]/i.test(v.lang)) || voices[0];
+  }
+  pickVoice();
+  if(synth) synth.onvoiceschanged = pickVoice;
+
+  function setSpeaking(on){ card.classList.toggle('speaking', on); }
+
+  function updatePauseBtn(){
+    if(pauseLbl) pauseLbl.textContent = paused ? 'Resume' : 'Pause';
+    pauseBtn.setAttribute('aria-label', paused ? 'Resume voice' : 'Pause voice');
+  }
+
+  function speak(text, opts){
+    opts = opts || {};
+    if(!synth) return;
+    // the arbiter is the single gatekeeper: it refuses while the rocket owns
+    // the stage and always calls speechSynthesis.cancel() before narration
+    if(arbiter && !arbiter.canSpeak('assistant')) return;
+    if(!opts.queue){
+      if(arbiter) arbiter.request('assistant');
+      else synth.cancel();
+    }
+    if(paused) synth.resume();   // a cancelled-while-paused synth stays stuck without this
+    paused = false; updatePauseBtn();
+    const u = new SpeechSynthesisUtterance(text);
+    if(voice) u.voice = voice;
+    u.rate = 0.96;
+    u.pitch = 1.04;
+    u.onstart = () => { setSpeaking(true); if(opts.onstart) opts.onstart(); };
+    u.onend = u.onerror = () => {
+      if(!synth.speaking && !synth.pending){
+        setSpeaking(false); paused = false; updatePauseBtn();
+        if(arbiter) arbiter.release('assistant');
+      }
+    };
+    synth.speak(u);
+  }
+
+  function stopSpeaking(){
+    if(synth) synth.cancel();
+    paused = false; setSpeaking(false); updatePauseBtn();
+    if(arbiter) arbiter.release('assistant');
+  }
+
+  function meterBand(){ return (window.pemState && window.pemState.band) || null; }
+
+  function showLesson(id, autoSpeak){
+    const lesson = LESSONS[id];
+    if(!lesson) return;
+    // during a rocket launch the page auto-scrolls — stay silent and untouched
+    if(arbiter && arbiter.isActive('rocket')) return;
+    currentId = id;
+    const now = Date.now();
+    const willSpeak = autoSpeak && (!spokenAt[id] || now - spokenAt[id] > REVISIT_MS);
+    let text = lesson.text;
+    // smart context: weave the meter into the lesson when its range is still new
+    if(willSpeak){
+      const band = meterBand();
+      if(band && !bandsExplained.has(band) && BAND_CONTEXT[band]){
+        text += ' ' + BAND_CONTEXT[band];
+        bandsExplained.add(band);
+      }
+    }
+    topicEl.textContent = lesson.title;
+    textEl.textContent = text;
+    if(willSpeak){
+      spokenAt[id] = now;
+      speak(text, { queue: justHired });
+      justHired = false;
+    }
+  }
+
+  function startWatching(){
+    if(io) return;
+    const sections = Object.keys(LESSONS)
+      .map(id => document.getElementById(id)).filter(Boolean);
+    io = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if(!entry.isIntersecting) return;
+        if(entry.target.id === currentId) return;
+        showLesson(entry.target.id, true);
+      });
+    }, { rootMargin: '-22% 0px -68% 0px', threshold: 0.1 });
+    sections.forEach(s => io.observe(s));
+    startHintWatch();
+  }
+
+  function stopWatching(){
+    if(io){ io.disconnect(); io = null; }
+    stopHintWatch();
+  }
+
+  function hire(){
+    hired = true;
+    justHired = true;
+    currentId = null;
+    spokenAt = Object.create(null);
+    bandsExplained = new Set();
+    resetCoach();
+    lastBand = meterBand();   // greeting covers the start — no instant range lecture
+    // assistant takes full ownership of narration; meter goes visual-only
+    if(arbiter) arbiter.setOwner('assistant');
+    btn.classList.add('hired');
+    btn.setAttribute('aria-pressed', 'true');
+    btnLabel.textContent = 'Fire Assistant';
+    card.classList.add('open');
+    card.setAttribute('aria-hidden', 'false');
+    topicEl.textContent = 'Welcome aboard!';
+    textEl.textContent = GREETING;
+    speak(GREETING);
+    startWatching();
+  }
+
+  function fire(){
+    hired = false;
+    stopWatching();
+    stopSpeaking();
+    // hand narration back — the meter may speak again on its own
+    if(arbiter) arbiter.clearOwner('assistant');
+    btn.classList.remove('hired');
+    btn.setAttribute('aria-pressed', 'false');
+    btnLabel.textContent = 'Hire Assistant';
+    card.classList.remove('open');
+    card.setAttribute('aria-hidden', 'true');
+  }
+
+  btn.addEventListener('click', () => hired ? fire() : hire());
+  fireBtn.addEventListener('click', fire);
+
+  repeatBtn.addEventListener('click', () => {
+    if(!hired) return;
+    // repeat exactly what's on the board — lesson, pressure check or coach remark
+    if(textEl.textContent) speak(textEl.textContent);
+    else if(currentId && LESSONS[currentId]) speak(LESSONS[currentId].text);
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    if(!synth || !synth.speaking) return;
+    if(paused){ synth.resume(); paused = false; }
+    else { synth.pause(); paused = true; }
+    updatePauseBtn();
+  });
+
+  treatBtn.addEventListener('click', () => {
+    if(!hired) return;
+    topicEl.textContent = 'A little thank-you';
+    textEl.textContent = TREAT_LINE;
+    currentId = null;   // scrolling back into a section restores its lesson text
+    // a small happy wiggle — restart the animation even on rapid clicks
+    card.classList.remove('happy');
+    void card.offsetWidth;
+    card.classList.add('happy');
+    clearTimeout(happyTimer);
+    happyTimer = setTimeout(() => card.classList.remove('happy'), 1000);
+    speak(TREAT_LINE);
+  });
+
+  // ── pressure-range commentary ─────────────────────────────────────────
+  // when the meter crosses into a new range, explain it once per hire —
+  // queued politely behind whatever the assistant is currently saying
+  document.addEventListener('pem:levelchange', e => {
+    const band = e.detail && e.detail.band;
+    if(band === lastBand) return;
+    lastBand = band;
+    if(!hired || !band) return;
+    if(arbiter && arbiter.isActive('rocket')) return;
+    if(bandsExplained.has(band) || !BAND_EXPLAIN[band]) return;
+    bandsExplained.add(band);
+    const line = BAND_EXPLAIN[band];
+    const levelTitle = (e.detail && e.detail.level) || 'Pressure update';
+    speak(line, {
+      queue: !!(synth && (synth.speaking || synth.pending)),
+      onstart: () => {           // update the card only when this line actually plays
+        topicEl.textContent = 'Pressure Check — ' + levelTitle;
+        textEl.textContent = line;
+        currentId = null;
+      }
+    });
+  });
+
+  // ── rocket launch has absolute priority ───────────────────────────────
+  if(arbiter){
+    arbiter.on('rocket:start', () => {
+      if(hired) stopSpeaking();   // tidy UI state; the arbiter already cancelled the voice
+    });
+    arbiter.on('rocket:end', () => {
+      if(!hired) return;
+      currentId = null;           // let the section under us re-show its lesson text
+      speak(ROCKET_RESUME, {
+        onstart: () => {
+          topicEl.textContent = 'Mission complete';
+          textEl.textContent = ROCKET_RESUME;
+        }
+      });
+    });
+  }
+
+  /* ── simulation coach ──────────────────────────────────────────────────
+     Watches the student's hands: sliders, buttons and drags inside every
+     simulation. Explains what they did, what changed on screen and why —
+     each remark once per hire, so the teacher never nags. */
+
+  const COACH_REACT = {
+    'knife:sharp':  "Good choice — the sharp knife. Look at the area value on your screen: only six square millimetres. Now hold the PUSH button and watch how fast the pressure climbs.",
+    'knife:blunt':  "Now the blunt knife. Notice the area jumped to six hundred square millimetres. Hold the PUSH button and compare — same force, far less pressure. That's why it squashes instead of cutting.",
+    'knife:push':   "Keep holding and watch the numbers — the force is rising while the area stays fixed, so the pressure shoots up. Notice the dent growing exactly where the edge concentrates the force.",
+    'types:node':   "Nicely done. Each bubble is a different way of measuring pressure — look at the real-life example that appeared on your screen, then try the other bubbles and compare them.",
+    'beat':         "There it goes — watch the pulse travel along the artery on your screen. Each beat is your heart creating a burst of pressure; that peak is the systolic number.",
+    'boyle:start':  "You're squeezing the gas. Watch the particles — with less space they hit the walls more often, and look, the pressure gauge is already climbing.",
+    'boyle:half':   "Pause here and compare the values: the volume is about half, and the pressure is nearly double. That is Boyle's Law exactly — pressure times volume stays constant."
+  };
+
+  const SLIDER_COACH = {
+    'pascal-slider': {
+      first: "You're pushing the small piston down. Now look at the right side of your screen — the large piston rises and lifts the car. The fluid carries your pressure across, and the bigger area turns it into a bigger force."
+    },
+    'depth-slider': {
+      first: "Watch the diver sink as you drag. Every metre of water above adds weight, so the pressure number keeps climbing. Pause here and compare the value now with the value at the surface.",
+      extremeAt: 35,
+      extreme: "Look how deep we are now — the pressure is several times what we feel at the surface. Notice the diver's face! Real divers train carefully for depths like this."
+    },
+    'stress-slider': {
+      first: "You're raising the stress level. Notice both numbers climbing — stress makes the heart squeeze harder, so the pressure inside the arteries rises.",
+      extremeAt: 80,
+      extreme: "Look at those readings — that is far above a healthy level. This is exactly why managing stress genuinely protects your heart."
+    }
+  };
+
+  const SIM_HINTS = {
+    'card1':         "Here's a little experiment: choose the sharp knife, hold the PUSH button, and watch the pressure value. Then do the same with the blunt knife and compare the two numbers.",
+    'section-types': "Try clicking each pressure type bubble — every one of them shows a real place where that kind of pressure appears.",
+    'card2':         "Try moving the slider to the right and watch what happens — the small piston pushes down, and the large piston lifts the car.",
+    'card3':         "Drag the depth slider slowly to the right and watch the diver sink — keep an eye on how the pressure grows with every metre.",
+    'card4':         "Try dragging the brown piston to the left. Watch the particles bounce faster as their space shrinks — and watch what the pressure gauge does.",
+    'card5':         "Press the Beat button to send a pulse along the artery, then raise the stress slider and compare the values before and after.",
+    'card6':         "When you're ready, press IGNITE and watch closely — the thrust gauge shows pressure doing its work, all the way to liftoff."
+  };
+
+  let coachSaid = new Set();        // reactions + hints already given this hire
+  let interacted = new Set();       // sims the student already touched (no hint needed)
+  const sliderTimers = {};
+  let hintIO = null, hintTimer = 0, hintCard = null;
+
+  function resetCoach(){
+    coachSaid = new Set();
+    interacted = new Set();
+    clearTimeout(hintTimer);
+    hintCard = null;
+  }
+
+  function coachSay(key, text){
+    if(!hired || coachSaid.has(key) || !text) return;
+    if(arbiter && arbiter.isActive('rocket')) return;
+    coachSaid.add(key);
+    textEl.textContent = text;     // keep the current topic; the remark is live commentary
+    speak(text);
+  }
+
+  function markInteract(el){
+    const sim = el && el.closest && el.closest('#card1,#card2,#card3,#card4,#card5,#card6,#section-types');
+    if(!sim) return null;
+    interacted.add(sim.id);
+    if(hintCard === sim.id){ clearTimeout(hintTimer); hintCard = null; }
+    return sim.id;
+  }
+
+  // sliders — react when the student settles, not on every tick
+  document.addEventListener('input', e => {
+    const s = e.target;
+    if(!hired || !s || s.type !== 'range') return;
+    markInteract(s);
+    const conf = SLIDER_COACH[s.id];
+    if(!conf) return;
+    clearTimeout(sliderTimers[s.id]);
+    sliderTimers[s.id] = setTimeout(() => {
+      if(!coachSaid.has(s.id + ':first')) coachSay(s.id + ':first', conf.first);
+      else if(conf.extreme && +s.value >= conf.extremeAt) coachSay(s.id + ':extreme', conf.extreme);
+    }, 900);
+  }, true);
+
+  // buttons and clickable nodes
+  document.addEventListener('click', e => {
+    if(!hired) return;
+    const el = e.target.closest('button, .pressure-type-node');
+    if(!el) return;
+    markInteract(el);
+    const oc = el.getAttribute('onclick') || '';
+    if(oc.indexOf("setKnife('sharp')") !== -1)      coachSay('knife:sharp', COACH_REACT['knife:sharp']);
+    else if(oc.indexOf("setKnife('blunt')") !== -1) coachSay('knife:blunt', COACH_REACT['knife:blunt']);
+    else if(oc.indexOf('triggerHeartbeat') !== -1)  coachSay('beat', COACH_REACT['beat']);
+    else if(el.classList.contains('pressure-type-node')) coachSay('types:node', COACH_REACT['types:node']);
+  }, true);
+
+  // holds and drags
+  document.addEventListener('pointerdown', e => {
+    if(!hired) return;
+    const push = e.target.closest && e.target.closest('#btn-push');
+    if(push){ markInteract(push); coachSay('knife:push', COACH_REACT['knife:push']); return; }
+    const piston = e.target.closest && e.target.closest('#boyle-piston');
+    if(piston){ markInteract(piston); coachSay('boyle:start', COACH_REACT['boyle:start']); }
+  }, true);
+
+  document.addEventListener('pointerup', e => {
+    if(!hired) return;
+    if(!(e.target.closest && e.target.closest('#boyle-piston'))) return;
+    const vEl = document.getElementById('c4-v');
+    const v = vEl ? parseInt(vEl.textContent, 10) : NaN;
+    if(!isNaN(v) && v <= 55) coachSay('boyle:half', COACH_REACT['boyle:half']);
+  }, true);
+
+  // gentle one-time hint when the student lingers on a sim without touching it
+  function scheduleHint(id){
+    if(coachSaid.has('hint:' + id) || interacted.has(id)) return;
+    clearTimeout(hintTimer);
+    hintCard = id;
+    hintTimer = setTimeout(function fire(){
+      if(!hired || hintCard !== id || interacted.has(id)) return;
+      // wait politely if a voice is busy, paused, or the rocket owns the stage
+      if(paused || (synth && (synth.speaking || synth.pending)) ||
+         (arbiter && arbiter.isActive('rocket'))){
+        hintTimer = setTimeout(fire, 8000);
+        return;
+      }
+      coachSay('hint:' + id, SIM_HINTS[id]);
+    }, 14000);
+  }
+
+  function startHintWatch(){
+    if(hintIO) return;
+    hintIO = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if(en.isIntersecting) scheduleHint(en.target.id);
+        else if(hintCard === en.target.id){ clearTimeout(hintTimer); hintCard = null; }
+      });
+    }, { rootMargin: '-20% 0px -20% 0px', threshold: 0.25 });
+    Object.keys(SIM_HINTS).forEach(id => {
+      const el = document.getElementById(id);
+      if(el) hintIO.observe(el);
+    });
+  }
+
+  function stopHintWatch(){
+    if(hintIO){ hintIO.disconnect(); hintIO = null; }
+    clearTimeout(hintTimer);
+    hintCard = null;
+  }
+
+  // never leave a voice running after leaving the page
+  window.addEventListener('pagehide', () => { if(synth) synth.cancel(); });
+
+  updatePauseBtn();
 })();
 </script>
 </body>
