@@ -3305,49 +3305,49 @@ window.VoiceArbiter = (function(){
   const QUIZ_DATA = [
     {
       q: 'What is the SI unit of pressure?',
-      opts: ['Newton (N)', 'Pascal (Pa)', 'Joule (J)', 'Watt (W)'],
+      opts: [')Newton (N)', ')Pascal (Pa)', ')Joule (J)', ')Watt (W)'],
       ans: 1,
       hint: 'It is named after Blaise Pascal.',
       explain: 'The SI unit of pressure is the Pascal (Pa). 1 Pa = 1 N/m².'
     },
     {
       q: 'If the same force acts on a smaller area, the pressure will…',
-      opts: ['Decrease', 'Stay the same', 'Increase', 'Disappear'],
+      opts: [')Decrease', ')Stay the same', ')Increase', ')Disappear'],
       ans: 2,
       hint: 'Use P = F ÷ A.',
       explain: 'Pressure increases when the area gets smaller while force stays the same.'
     },
     {
       q: 'Which pressure is shown by a car tyre pressure gauge?',
-      opts: ['Atmospheric pressure', 'Gauge pressure', 'Absolute pressure', 'Differential pressure'],
+      opts: [')Atmospheric pressure', ')Gauge pressure', ')Absolute pressure', ')Differential pressure'],
       ans: 1,
       hint: 'It measures pressure relative to the air around us.',
       explain: 'A tyre gauge shows gauge pressure, not absolute pressure.'
     },
     {
       q: 'Pascal’s law is used in which device?',
-      opts: ['Hydraulic lift', 'Thermometer', 'Compass', 'Magnifying glass'],
+      opts: [')Hydraulic lift', ')Thermometer', ')Compass', ')Magnifying glass'],
       ans: 0,
       hint: 'It helps lift heavy cars in workshops.',
       explain: 'Hydraulic systems work because pressure applied to a liquid is transmitted equally.'
     },
     {
       q: 'What happens to pressure as you go deeper under water?',
-      opts: ['It decreases', 'It stays the same', 'It increases', 'It becomes zero'],
+      opts: [')It decreases', ')It stays the same', ')It increases', ')It becomes zero'],
       ans: 2,
       hint: 'More water above you means more weight.',
       explain: 'Water pressure increases with depth because more water presses down from above.'
     },
     {
       q: 'Boyle’s law says that when the volume of a gas goes down, its pressure…',
-      opts: ['Goes down', 'Stays the same', 'Goes up', 'Stops'],
+      opts: [')Goes down', ')Stays the same', ')Goes up', ')Stops'],
       ans: 2,
       hint: 'More squeezing means more collisions.',
       explain: 'For a trapped gas, less volume means more frequent collisions and higher pressure.'
     },
     {
       q: 'The heart creates pressure to…',
-      opts: ['Cool the body', 'Move blood through vessels', 'Make bones grow', 'Stop breathing'],
+      opts: [')Cool the body', ')Move blood through vessels', ')Make bones grow', ')Stop breathing'],
       ans: 1,
       hint: 'Blood must be pumped all around the body.',
       explain: 'The heart pumps blood by creating pressure inside the blood vessels.'
@@ -3479,7 +3479,7 @@ window.VoiceArbiter = (function(){
   const synth = window.speechSynthesis || null;
   const arbiter = window.VoiceArbiter || null;
 
-  const GREETING   = "Congratulations, you hired me! I'll guide you through pressure concepts as you explore. Keep an eye on the pressure meter on the top-right — we'll use it together as we learn.";
+  const GREETING   = "Congratulations, you hired me! I'll guide you through pressure concepts as you explore. Keep an eye on the pressure meter on the top-right, because we'll use it together as we learn.";
   const TREAT_LINE = "Thank you! I love these. I'm fully recharged and ready to help you learn even more.";
   const ROCKET_RESUME = "Rocket launch completed. Let's continue exploring pressure.";
   const REVISIT_MS = 120000;   // re-explain a section when revisited after 2 minutes
@@ -3493,48 +3493,48 @@ window.VoiceArbiter = (function(){
   };
   // shorter versions woven into a section explanation when the range is still new
   const BAND_CONTEXT = {
-    low:     "As you can see on the pressure meter on the top-right, we're still at a low pressure level — about the weight of a few sheets of paper — so the meter stays calm.",
+    low:     "As you can see on the pressure meter on the top-right, we're still at a low pressure level, about the weight of a few sheets of paper, so the meter stays calm.",
     medium:  "Take a quick look at the pressure meter on the top-right: it has entered a stronger range, comparable to carrying a loaded backpack, which is why it's becoming more active.",
-    heavy:   "Notice the pressure meter on the top-right — it's showing heavy pressure now, like a completely full bucket of water pushing downward. That's why the ring is shaking more.",
-    extreme: "And look at the pressure meter on the top-right — we're approaching extreme pressure, like several full buckets stacked above you. That's why the meter is reacting so intensely."
+    heavy:   "Notice the pressure meter on the top-right. It's showing heavy pressure now, like a completely full bucket of water pushing downward. That's why the ring is shaking more.",
+    extreme: "And look at the pressure meter on the top-right. We're approaching extreme pressure, like several full buckets stacked above you. That's why the meter is reacting so intensely."
   };
 
   const LESSONS = {
     'section-hook': {
-      title: 'Force & Area — The Building Blocks',
-      text: "Let's warm up with two ideas you already know. A force is a push or a pull — press your thumb on a drawing pin and you're applying one. An area is the amount of surface that push spreads over. Hold on to both, because the question on your screen is exactly the right one to ask: what happens when force and area work together? That's where pressure is born."
+      title: 'Force & Area: The Building Blocks',
+      text: "Let's warm up with two ideas you already know. A force is a push or a pull. Press your thumb on a drawing pin and you're applying one. An area is the amount of surface that push spreads over. Hold on to both, because the question on your screen is exactly the right one to ask: what happens when force and area work together? That's where pressure is born."
     },
     'section-pressure': {
       title: 'Pressure = Force ÷ Area',
-      text: "Pause here, because this is the key idea of the whole lesson. Look at the formula on your screen: pressure equals force divided by area. Same force on a smaller area means bigger pressure. That is why a sharp pin pierces paper easily, but a flat coin cannot. In the knife demo just below, try it yourself — hold the push button with each knife and compare the pressure values you get."
+      text: "Pause here, because this is the key idea of the whole lesson. Look at the formula on your screen: pressure equals force divided by area. Same force on a smaller area means bigger pressure. That is why a sharp pin pierces paper easily, but a flat coin cannot. In the knife demo just below, try it yourself: hold the push button with each knife and compare the pressure values you get."
     },
     'section-types': {
       title: 'The Four Types of Pressure',
-      text: "Now, pressure wears different names depending on what we compare it to. As you can see on your screen, there are four. Atmospheric pressure is the weight of the air above you — the reason your ears pop in an aeroplane. Gauge pressure is measured above atmospheric, like a tyre gauge reading. Absolute pressure counts from a perfect vacuum, and differential pressure is the difference between two points — that is how aircraft measure their speed. Click each bubble and look at the real-life example that appears."
+      text: "Now, pressure wears different names depending on what we compare it to. As you can see on your screen, there are four. Atmospheric pressure is the weight of the air above you, the reason your ears pop in an aeroplane. Gauge pressure is measured above atmospheric, like a tyre gauge reading. Absolute pressure counts from a perfect vacuum, and differential pressure is the difference between two points, which is how aircraft measure their speed. Click each bubble and look at the real-life example that appears."
     },
     'section-pascal': {
-      title: "Pascal's Law — The Power of Fluids",
-      text: "This simulation is one of my favourites. Pascal's Law says that when you squeeze a trapped fluid, the pressure spreads equally in every direction. Now try moving the slider below and look carefully: as the small piston pushes down, the very same pressure appears under the large piston — and because it acts on a bigger area, it lifts the whole car. That is exactly how a mechanic raises a car with one hand."
+      title: "Pascal's Law: The Power of Fluids",
+      text: "This simulation is one of my favourites. Pascal's Law says that when you squeeze a trapped fluid, the pressure spreads equally in every direction. Now try moving the slider below and look carefully: as the small piston pushes down, the very same pressure appears under the large piston, and because it acts on a bigger area, it lifts the whole car. That is exactly how a mechanic raises a car with one hand."
     },
     'section-underwater': {
-      title: 'Hydrostatic Pressure — Deeper Means Stronger',
-      text: "Let's dive. Under water, pressure grows with depth, because every metre of water above you adds its weight. Drag the depth slider slowly and watch the diver — just ten metres down, the pressure has already roughly doubled. Notice the diver's face as you go deeper! This is why your ears hurt at the bottom of a swimming pool, and why submarines need thick steel hulls."
+      title: 'Hydrostatic Pressure: Deeper Means Stronger',
+      text: "Let's dive. Under water, pressure grows with depth, because every metre of water above you adds its weight. Drag the depth slider slowly and watch the diver. Just ten metres down, the pressure has already roughly doubled. Notice the diver's face as you go deeper! This is why your ears hurt at the bottom of a swimming pool, and why submarines need thick steel hulls."
     },
     'section-boyle': {
-      title: "Boyle's Law — Squeeze a Gas",
-      text: "Here is Boyle's Law, live on your screen. Try dragging the brown piston to the left and watch the gas particles carefully — with less space, they hit the walls more often, so the pressure gauge climbs. Squeeze the gas into half the space and the pressure doubles, as long as the temperature stays the same. You can feel this at home: block the end of a bicycle pump and push — the trapped air pushes back harder and harder."
+      title: "Boyle's Law: Squeeze a Gas",
+      text: "Here is Boyle's Law, live on your screen. Try dragging the brown piston to the left and watch the gas particles carefully. With less space, they hit the walls more often, so the pressure gauge climbs. Squeeze the gas into half the space and the pressure doubles, as long as the temperature stays the same. You can feel this at home: block the end of a bicycle pump and push, and the trapped air pushes back harder and harder."
     },
     'section-blood': {
-      title: "Blood Pressure — Your Body's Pump",
-      text: "Your heart is a pump that creates pressure to push blood around your body. Press the Beat button and watch the pulse travel along the artery on your screen. A reading has two numbers: systolic, when the heart squeezes, and diastolic, when it relaxes between beats. Now try raising the stress slider and notice what happens to those numbers — that is why doctors keep such a close eye on stress."
+      title: "Blood Pressure: Your Body's Pump",
+      text: "Your heart is a pump that creates pressure to push blood around your body. Press the Beat button and watch the pulse travel along the artery on your screen. A reading has two numbers: systolic, when the heart squeezes, and diastolic, when it relaxes between beats. Now try raising the stress slider and notice what happens to those numbers. That is why doctors keep such a close eye on stress."
     },
     'section-apps': {
       title: 'Pressure in the Real World',
-      text: "Pause here for a moment and look at these cards — every one of them is the same idea wearing a different costume. Needles and knives concentrate force onto tiny areas. Tyres hold air at just the right pressure to carry a whole car. Hydraulic brakes turn a light press of your foot into a powerful stop. And rockets fly because high-pressure gas rushes downward, pushing the rocket up. Once you can spot pressure, you will see it everywhere."
+      text: "Pause here for a moment and look at these cards. Every one of them is the same idea wearing a different costume. Needles and knives concentrate force onto tiny areas. Tyres hold air at just the right pressure to carry a whole car. Hydraulic brakes turn a light press of your foot into a powerful stop. And rockets fly because high-pressure gas rushes downward, pushing the rocket up. Once you can spot pressure, you will see it everywhere."
     },
     'section-quiz': {
-      title: 'Quiz Time — Show What You Know',
-      text: "Time to show what you know. Read each question slowly and picture the simulations you just explored: smaller area means more pressure, deeper water means more pressure, and squeezing a gas raises its pressure. Use the hints if you get stuck — a wrong answer you learn from is worth more than a lucky guess. Good luck, I'm right here with you."
+      title: 'Quiz Time: Show What You Know',
+      text: "Time to show what you know. Read each question slowly and picture the simulations you just explored: smaller area means more pressure, deeper water means more pressure, and squeezing a gas raises its pressure. Use the hints if you get stuck. A wrong answer you learn from is worth more than a lucky guess. Good luck, I'm right here with you."
     }
   };
 
@@ -3737,7 +3737,7 @@ window.VoiceArbiter = (function(){
     speak(line, {
       queue: !!(synth && (synth.speaking || synth.pending)),
       onstart: () => {           // update the card only when this line actually plays
-        topicEl.textContent = 'Pressure Check — ' + levelTitle;
+        topicEl.textContent = 'Pressure Check: ' + levelTitle;
         textEl.textContent = line;
         currentId = null;
       }
@@ -3767,39 +3767,39 @@ window.VoiceArbiter = (function(){
      each remark once per hire, so the teacher never nags. */
 
   const COACH_REACT = {
-    'knife:sharp':  "Good choice — the sharp knife. Look at the area value on your screen: only six square millimetres. Now hold the PUSH button and watch how fast the pressure climbs.",
-    'knife:blunt':  "Now the blunt knife. Notice the area jumped to six hundred square millimetres. Hold the PUSH button and compare — same force, far less pressure. That's why it squashes instead of cutting.",
-    'knife:push':   "Keep holding and watch the numbers — the force is rising while the area stays fixed, so the pressure shoots up. Notice the dent growing exactly where the edge concentrates the force.",
-    'types:node':   "Nicely done. Each bubble is a different way of measuring pressure — look at the real-life example that appeared on your screen, then try the other bubbles and compare them.",
-    'beat':         "There it goes — watch the pulse travel along the artery on your screen. Each beat is your heart creating a burst of pressure; that peak is the systolic number.",
-    'boyle:start':  "You're squeezing the gas. Watch the particles — with less space they hit the walls more often, and look, the pressure gauge is already climbing.",
-    'boyle:half':   "Pause here and compare the values: the volume is about half, and the pressure is nearly double. That is Boyle's Law exactly — pressure times volume stays constant."
+    'knife:sharp':  "Good choice, the sharp knife. Look at the area value on your screen: only six square millimetres. Now hold the PUSH button and watch how fast the pressure climbs.",
+    'knife:blunt':  "Now the blunt knife. Notice the area jumped to six hundred square millimetres. Hold the PUSH button and compare: same force, far less pressure. That's why it squashes instead of cutting.",
+    'knife:push':   "Keep holding and watch the numbers. The force is rising while the area stays fixed, so the pressure shoots up. Notice the dent growing exactly where the edge concentrates the force.",
+    'types:node':   "Nicely done. Each bubble is a different way of measuring pressure. Look at the real-life example that appeared on your screen, then try the other bubbles and compare them.",
+    'beat':         "There it goes! Watch the pulse travel along the artery on your screen. Each beat is your heart creating a burst of pressure; that peak is the systolic number.",
+    'boyle:start':  "You're squeezing the gas. Watch the particles: with less space they hit the walls more often, and look, the pressure gauge is already climbing.",
+    'boyle:half':   "Pause here and compare the values: the volume is about half, and the pressure is nearly double. That is Boyle's Law exactly, pressure times volume stays constant."
   };
 
   const SLIDER_COACH = {
     'pascal-slider': {
-      first: "You're pushing the small piston down. Now look at the right side of your screen — the large piston rises and lifts the car. The fluid carries your pressure across, and the bigger area turns it into a bigger force."
+      first: "You're pushing the small piston down. Now look at the right side of your screen: the large piston rises and lifts the car. The fluid carries your pressure across, and the bigger area turns it into a bigger force."
     },
     'depth-slider': {
       first: "Watch the diver sink as you drag. Every metre of water above adds weight, so the pressure number keeps climbing. Pause here and compare the value now with the value at the surface.",
       extremeAt: 35,
-      extreme: "Look how deep we are now — the pressure is several times what we feel at the surface. Notice the diver's face! Real divers train carefully for depths like this."
+      extreme: "Look how deep we are now. The pressure is several times what we feel at the surface. Notice the diver's face! Real divers train carefully for depths like this."
     },
     'stress-slider': {
-      first: "You're raising the stress level. Notice both numbers climbing — stress makes the heart squeeze harder, so the pressure inside the arteries rises.",
+      first: "You're raising the stress level. Notice both numbers climbing. Stress makes the heart squeeze harder, so the pressure inside the arteries rises.",
       extremeAt: 80,
-      extreme: "Look at those readings — that is far above a healthy level. This is exactly why managing stress genuinely protects your heart."
+      extreme: "Look at those readings. That is far above a healthy level. This is exactly why managing stress genuinely protects your heart."
     }
   };
 
   const SIM_HINTS = {
     'card1':         "Here's a little experiment: choose the sharp knife, hold the PUSH button, and watch the pressure value. Then do the same with the blunt knife and compare the two numbers.",
-    'section-types': "Try clicking each pressure type bubble — every one of them shows a real place where that kind of pressure appears.",
-    'card2':         "Try moving the slider to the right and watch what happens — the small piston pushes down, and the large piston lifts the car.",
-    'card3':         "Drag the depth slider slowly to the right and watch the diver sink — keep an eye on how the pressure grows with every metre.",
-    'card4':         "Try dragging the brown piston to the left. Watch the particles bounce faster as their space shrinks — and watch what the pressure gauge does.",
+    'section-types': "Try clicking each pressure type bubble. Every one of them shows a real place where that kind of pressure appears.",
+    'card2':         "Try moving the slider to the right and watch what happens: the small piston pushes down, and the large piston lifts the car.",
+    'card3':         "Drag the depth slider slowly to the right and watch the diver sink, and keep an eye on how the pressure grows with every metre.",
+    'card4':         "Try dragging the brown piston to the left. Watch the particles bounce faster as their space shrinks, and watch what the pressure gauge does.",
     'card5':         "Press the Beat button to send a pulse along the artery, then raise the stress slider and compare the values before and after.",
-    'card6':         "When you're ready, press IGNITE and watch closely — the thrust gauge shows pressure doing its work, all the way to liftoff."
+    'card6':         "When you're ready, press IGNITE and watch closely. The thrust gauge shows pressure doing its work, all the way to liftoff."
   };
 
   let coachSaid = new Set();        // reactions + hints already given this hire
