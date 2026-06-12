@@ -344,20 +344,76 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
   box-shadow:0 4px 10px rgba(59,43,43,.14);padding:0}
 .sound-toggle:active{transform:scale(.9)}
 
-/* Scroll pressure gauge — fixed right edge */
-.scroll-gauge{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:90;
-  display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 7px;
-  background:rgba(255,246,233,.97);border:2px solid #F2E3CC;
-  border-radius:14px 0 0 14px;box-shadow:-4px 0 18px rgba(59,43,43,.13);min-width:44px}
-.sg-title{font-family:'Fredoka One',sans-serif;font-size:.62rem;color:var(--pressure);
-  text-align:center;letter-spacing:.5px}
-.gauge-track{width:14px;height:130px;background:#E0D0C0;border-radius:7px;
-  position:relative;overflow:hidden;border:2px solid #ccc}
-.gauge-fill{position:absolute;bottom:0;left:0;right:0;height:0%;border-radius:7px;
-  background:#58B368;transition:height .25s ease,background .25s ease}
-.gauge-fill.glow{box-shadow:0 0 10px #FF5A4E,0 0 20px rgba(255,90,78,.45)}
-.sg-val{font-family:'Fredoka One',sans-serif;font-size:.58rem;color:var(--ink-soft);
-  text-align:center;max-width:38px;line-height:1.25;word-break:break-all}
+/* Pressure Experience Meter — fixed circular gauge, top-right */
+.pem{position:fixed;top:130px;right:20px;z-index:95;display:flex;flex-direction:column;
+  align-items:center;gap:8px}
+.pem-shake{display:flex;flex-direction:column;align-items:center;gap:8px;
+  animation:pemShake var(--pem-dur,.5s) ease-in-out infinite;will-change:transform}
+.pem-dial{pointer-events:auto;position:relative;width:104px;height:104px;border-radius:50%;
+  cursor:pointer;background:rgba(255,246,233,.97);border:3px solid #F2E3CC;
+  box-shadow:0 8px 20px rgba(59,43,43,.16);transition:box-shadow .4s ease,border-color .4s ease}
+.pem-dial:focus-visible{outline:3px solid var(--area);outline-offset:3px}
+.pem-dial svg{position:absolute;inset:4px;width:calc(100% - 8px);height:calc(100% - 8px);
+  transform:rotate(-90deg)}
+.pem-arc-track{fill:none;stroke:#E0D0C0;stroke-width:9}
+.pem-arc{fill:none;stroke:#58B368;stroke-width:9;stroke-linecap:round}
+.pem-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:1px}
+.pem-label{font-family:'Fredoka One',sans-serif;font-size:.55rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--pressure)}
+.pem-value{font-family:'Fredoka One',sans-serif;font-size:.92rem;color:var(--ink);line-height:1}
+.pem-board{pointer-events:auto;width:152px;background:rgba(255,246,233,.97);
+  border:2px solid #F2E3CC;border-radius:14px;padding:8px 10px;text-align:center;
+  box-shadow:0 6px 16px rgba(59,43,43,.13)}
+.pem-board-title{font-family:'Fredoka One',sans-serif;font-size:.72rem;color:#58B368;
+  transition:color .3s ease}
+.pem-board-msg{font-size:.66rem;line-height:1.35;color:#6b5a5a;margin-top:3px}
+/* warning / intensity tiers */
+.pem[data-tier="1"] .pem-dial{border-color:#FFD9A0}
+.pem[data-tier="2"] .pem-dial{border-color:#FF9F2E;
+  box-shadow:0 8px 20px rgba(255,159,46,.3),0 0 16px rgba(255,159,46,.45)}
+.pem[data-tier="3"] .pem-dial{border-color:#FF5A4E;
+  box-shadow:0 8px 20px rgba(255,90,78,.35),0 0 20px rgba(255,90,78,.55);
+  animation:pemPulse 1s ease-in-out infinite}
+.pem[data-tier="4"] .pem-dial{border-color:#FF5A4E;
+  box-shadow:0 0 24px rgba(255,40,30,.65),0 0 46px rgba(255,40,30,.35);
+  animation:pemPulse .55s ease-in-out infinite}
+@keyframes pemPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes pemShake{
+  0%,100%{transform:translate3d(0,0,0)}
+  20%{transform:translate3d(calc(var(--pem-amp,.4)*1px),calc(var(--pem-amp,.4)*-.6px),0)}
+  40%{transform:translate3d(calc(var(--pem-amp,.4)*-.8px),calc(var(--pem-amp,.4)*.5px),0)}
+  60%{transform:translate3d(calc(var(--pem-amp,.4)*.7px),calc(var(--pem-amp,.4)*.8px),0)}
+  80%{transform:translate3d(calc(var(--pem-amp,.4)*-.6px),calc(var(--pem-amp,.4)*-.8px),0)}
+}
+/* hover / tap expand card */
+.pem-card{pointer-events:auto;position:absolute;top:0;right:calc(100% + 12px);width:200px;
+  background:#fff;border:3px solid #F2E3CC;border-radius:16px;padding:12px 14px;
+  box-shadow:0 10px 24px rgba(59,43,43,.18);opacity:0;visibility:hidden;
+  transform:translateX(10px) scale(.94);
+  transition:opacity .25s ease,transform .25s cubic-bezier(.34,1.4,.64,1),visibility .25s}
+.pem.pem-open .pem-card{opacity:1;visibility:visible;transform:none}
+.pem-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  font-size:.7rem;color:#6b5a5a;margin-top:5px}
+.pem-row:first-child{margin-top:0}
+.pem-row b{font-family:'Fredoka One',sans-serif;font-weight:400;color:var(--ink);
+  text-align:right;font-size:.72rem}
+.pem-card-msg{font-size:.68rem;line-height:1.4;color:#6b5a5a;margin-top:8px;
+  padding-top:8px;border-top:2px dashed #F2E3CC}
+.pem-sr{position:absolute;width:1px;height:1px;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+@media(max-width:720px){
+  .pem{top:128px;right:10px}
+  .pem-dial{width:70px;height:70px;border-width:2px}
+  .pem-arc-track,.pem-arc{stroke-width:10}
+  .pem-label{font-size:.42rem}
+  .pem-value{font-size:.68rem}
+  .pem-board{display:none}
+  .pem-card{width:172px;right:calc(100% + 8px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .pem-shake,.pem[data-tier] .pem-dial{animation:none!important}
+}
 
 /* ═══ CUSTOM CURSOR — ENHANCED ════════════════════════ */
 .cursor-dot,.cursor-ring,.cursor-ring2,.cursor-label{display:none}
@@ -558,11 +614,33 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
 </nav>
 <div class="scroll-progress" id="scroll-progress"></div>
 
-<!-- fixed scroll pressure gauge -->
-<div class="scroll-gauge" id="scroll-gauge">
-  <div class="sg-title">P ↑</div>
-  <div class="gauge-track"><div class="gauge-fill" id="sg-fill"></div></div>
-  <div class="sg-val" id="sg-val">0 Pa</div>
+<!-- fixed Pressure Experience Meter -->
+<div class="pem" id="pem" data-tier="0">
+  <div class="pem-shake">
+    <div class="pem-dial" id="pem-dial" tabindex="0" role="button" aria-expanded="false"
+         aria-label="Pressure experience meter. Pressure rises as you scroll. Press Enter for details.">
+      <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+        <circle class="pem-arc-track" cx="50" cy="50" r="44"/>
+        <circle class="pem-arc" id="pem-arc" cx="50" cy="50" r="44"
+                stroke-dasharray="276.46" stroke-dashoffset="276.46"/>
+      </svg>
+      <div class="pem-center">
+        <div class="pem-label">Pressure</div>
+        <div class="pem-value" id="pem-value">0 Pa</div>
+      </div>
+    </div>
+    <div class="pem-board">
+      <div class="pem-board-title" id="pem-title">Tiny Pressure</div>
+      <div class="pem-board-msg" id="pem-msg">About the weight of a few sheets of paper resting on your hand.</div>
+    </div>
+  </div>
+  <div class="pem-card" id="pem-card" role="dialog" aria-label="Pressure details" aria-hidden="true">
+    <div class="pem-row"><span>Current Pressure</span><b id="pem-c-pa">0 Pa</b></div>
+    <div class="pem-row"><span>Scroll Progress</span><b id="pem-c-scroll">0%</b></div>
+    <div class="pem-row"><span>Pressure Level</span><b id="pem-c-level">Tiny Pressure</b></div>
+    <div class="pem-card-msg" id="pem-c-msg">About the weight of a few sheets of paper resting on your hand.</div>
+  </div>
+  <span class="pem-sr" id="pem-sr" aria-live="polite"></span>
 </div>
 
 <nav class="site-nav section-nav" aria-label="Section navigation">
@@ -2113,37 +2191,135 @@ function resetRocket(){
    SCROLL ANIMATIONS
 ══════════════════════════════════ */
 (function(){
-  /* 1 — fixed pressure gauge */
-  const sgFill = document.getElementById('sg-fill');
-  const sgVal  = document.getElementById('sg-val');
-  const STEPS  = [
-    {t:0.00, label:'0 Pa',        color:'#58B368'},
-    {t:0.20, label:'1,000 Pa',    color:'#58B368'},
-    {t:0.45, label:'10,000 Pa',   color:'#FF9F2E'},
-    {t:0.70, label:'100,000 Pa',  color:'#FF5A4E'},
-    {t:0.90, label:'CRITICAL 💥', color:'#FF5A4E'},
+  /* 1 — Pressure Experience Meter (fixed circular gauge, top-right) */
+  const pem      = document.getElementById('pem');
+  const pemArc   = document.getElementById('pem-arc');
+  const pemValue = document.getElementById('pem-value');
+  const pemTitle = document.getElementById('pem-title');
+  const pemMsg   = document.getElementById('pem-msg');
+  const pemDial  = document.getElementById('pem-dial');
+  const pemCard  = document.getElementById('pem-card');
+  const pemSR    = document.getElementById('pem-sr');
+  const pemCPa     = document.getElementById('pem-c-pa');
+  const pemCScroll = document.getElementById('pem-c-scroll');
+  const pemCLevel  = document.getElementById('pem-c-level');
+  const pemCMsg    = document.getElementById('pem-c-msg');
+  const ARC_LEN = 276.46;
+  const pemReduced = window.matchMedia('(prefers-reduced-motion:reduce)');
+  const PEM_DURS = ['.5s','.42s','.34s','.26s','.2s'];
+
+  const LEVELS = [
+    {max:100,  title:'Tiny Pressure',       color:'#58B368',
+     msg:'About the weight of a few sheets of paper resting on your hand.'},
+    {max:200,  title:'Light Pressure',      color:'#58B368',
+     msg:'Like holding a smartphone in your palm.'},
+    {max:350,  title:'Building Pressure',   color:'#FF9F2E',
+     msg:'Imagine a thick textbook resting on your head.'},
+    {max:500,  title:'Noticeable Pressure', color:'#FF9F2E',
+     msg:'Similar to carrying a loaded school backpack.'},
+    {max:650,  title:'Strong Pressure',     color:'#FF5A4E',
+     msg:'Like balancing a half-filled bucket of water above your head.'},
+    {max:800,  title:'Heavy Pressure',      color:'#FF5A4E',
+     msg:'Like a completely full bucket of water pushing down on you.'},
+    {max:900,  title:'Extreme Pressure',    color:'#E8352A',
+     msg:'Imagine several full water buckets stacked above you.'},
+    {max:1000, title:'Massive Pressure',    color:'#E8352A',
+     msg:'Pressure this strong starts reaching forces that can feel overwhelming to the human body.'},
   ];
 
+  let pemRaf = 0, pemLastP = -1, pemLastLvl = -1, pemOpen = false;
+
+  function pemSpeak(lvl){
+    if(!('speechSynthesis' in window)) return;
+    if(window.soundFX && window.soundFX.isMuted()) return;
+    try{
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(lvl.title + '. ' + lvl.msg);
+      u.rate = 1; u.pitch = 1; u.volume = .9;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  function pemUpdateCard(pressure, t, lvl){
+    pemCPa.textContent     = pressure + ' Pa';
+    pemCScroll.textContent = Math.round(t*100) + '%';
+    pemCLevel.textContent  = lvl.title;
+    pemCMsg.textContent    = lvl.msg;
+  }
+
   const scrollProg = document.getElementById('scroll-progress');
-  function updateGauge(){
+  function pemRender(){
+    pemRaf = 0;
     const max = document.body.scrollHeight - window.innerHeight;
-    const t   = max>0 ? Math.min(1, window.scrollY/max) : 0;
-    sgFill.style.height = (t*100)+'%';
-    const r=Math.round(88+t*(255-88)), g=Math.round(179+t*(80-179)), b=Math.round(104+t*(50-104));
-    sgFill.style.background = `rgb(${r},${g},${b})`;
-    const step = STEPS.reduce((best,s)=> s.t<=t ? s : best, STEPS[0]);
-    sgVal.textContent = step.label;
-    sgVal.style.color  = step.color;
-    sgFill.classList.toggle('glow', t>=0.88);
+    const t   = max>0 ? Math.min(1, Math.max(0, window.scrollY/max)) : 0;
+    const pressure = Math.round(t*1000);
+
     // scroll progress bar
     if(scrollProg){
       const pct = t*100;
       scrollProg.style.width = pct+'%';
       scrollProg.style.background = pct<40 ? '#58B368' : pct<72 ? '#FF9F2E' : '#FF5A4E';
     }
+
+    if(pressure === pemLastP) return;
+    pemLastP = pressure;
+
+    pemArc.style.strokeDashoffset = (ARC_LEN*(1-t)).toFixed(1);
+    const r=Math.round(88+t*167), g=Math.round(179-t*99), b=Math.round(104-t*54);
+    pemArc.style.stroke = `rgb(${r},${g},${b})`;
+    pemValue.textContent = pressure + ' Pa';
+
+    // continuous vibration: amplitude scales smoothly with pressure
+    if(!pemReduced.matches){
+      pem.style.setProperty('--pem-amp', (0.35 + t*2.65).toFixed(2));
+    }
+
+    // intensity tier: 0 soft → 4 red warning (also sets shake speed)
+    const tier = t>=0.92 ? 4 : t>=0.8 ? 3 : t>=0.6 ? 2 : t>=0.35 ? 1 : 0;
+    if(pem.dataset.tier !== String(tier)){
+      pem.dataset.tier = String(tier);
+      if(!pemReduced.matches) pem.style.setProperty('--pem-dur', PEM_DURS[tier]);
+    }
+
+    let idx = 0;
+    while(idx < LEVELS.length-1 && pressure > LEVELS[idx].max) idx++;
+    if(idx !== pemLastLvl){
+      const lvl = LEVELS[idx];
+      pemTitle.textContent = lvl.title;
+      pemTitle.style.color = lvl.color;
+      pemMsg.textContent   = lvl.msg;
+      pemSR.textContent    = lvl.title + '. ' + pressure + ' pascals.';
+      if(pemLastLvl !== -1) pemSpeak(lvl);   // no narration on initial load
+      pemLastLvl = idx;
+    }
+
+    if(pemOpen) pemUpdateCard(pressure, t, LEVELS[idx]);
   }
-  window.addEventListener('scroll', updateGauge, {passive:true});
-  updateGauge();
+
+  function pemQueue(){ if(!pemRaf) pemRaf = requestAnimationFrame(pemRender); }
+  window.addEventListener('scroll', pemQueue, {passive:true});
+  window.addEventListener('resize', pemQueue, {passive:true});
+  pemRender();
+
+  function pemSetOpen(open){
+    pemOpen = open;
+    pem.classList.toggle('pem-open', open);
+    pemDial.setAttribute('aria-expanded', String(open));
+    pemCard.setAttribute('aria-hidden', String(!open));
+    if(open){ pemLastP = -1; pemRender(); }   // refresh card contents
+  }
+  let pemPointerType = 'mouse';
+  pem.addEventListener('pointerenter', e=>{ if(e.pointerType==='mouse') pemSetOpen(true); });
+  pem.addEventListener('pointerleave', e=>{ if(e.pointerType==='mouse') pemSetOpen(false); });
+  pemDial.addEventListener('pointerdown', e=>{ pemPointerType = e.pointerType; }, {passive:true});
+  pemDial.addEventListener('click', ()=>{ if(pemPointerType!=='mouse') pemSetOpen(!pemOpen); });
+  pemDial.addEventListener('keydown', e=>{
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); pemSetOpen(!pemOpen); }
+    else if(e.key==='Escape') pemSetOpen(false);
+  });
+  document.addEventListener('pointerdown', e=>{
+    if(pemOpen && pemPointerType!=='mouse' && !pem.contains(e.target)) pemSetOpen(false);
+  }, {passive:true});
 
   /* 2 — card entrance: slam in from alternating sides */
   const BURST_COLORS=['#FF5A4E','#58B368','#FF9F2E','#3E8BFA','#A04EF6'];
