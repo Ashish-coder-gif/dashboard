@@ -148,7 +148,15 @@ body{background:var(--cream);color:var(--ink);font-family:'Nunito',sans-serif;
 .btn-secondary{background:var(--area);color:#fff;box-shadow:0 4px 12px rgba(62,139,250,.3)}
 .btn-green{background:var(--leaf);color:#fff;box-shadow:0 4px 12px rgba(88,179,104,.3)}
 .btn-purple{background:var(--pressure);color:#fff;box-shadow:0 4px 12px rgba(160,78,246,.3)}
-.btn-outline{background:#fff;color:var(--ink);border:2px solid #E0D0C0}
+.btn-outline{background:#fff;color:var(--ink);border:2px solid #E0D0C0;
+  transition:transform .2s ease,box-shadow .2s ease,background .2s ease,color .2s ease,border-color .2s ease}
+.btn-outline.knife-selected{
+  background:linear-gradient(180deg,var(--tomato),#E2392E);
+  color:#fff;border-color:#E2392E;
+  box-shadow:0 6px 16px rgba(226,57,46,.35);
+  transform:scale(1.03);
+  animation:selectedPop .3s ease}
+@keyframes selectedPop{0%{transform:scale(1)}55%{transform:scale(1.08)}100%{transform:scale(1.03)}}
 
 label.slider-label{font-weight:700;font-size:.9rem;white-space:nowrap}
 input[type=range]{-webkit-appearance:none;height:6px;border-radius:3px;
@@ -816,8 +824,8 @@ body{animation:bgShift 8s ease-in-out infinite alternate}
   </svg>
 
   <div class="controls">
-    <button class="btn btn-outline" onclick="setKnife('sharp')">Sharp</button>
-    <button class="btn btn-outline" onclick="setKnife('blunt')">Blunt</button>
+    <button id="btn-knife-sharp" class="btn btn-outline knife-selected" onclick="setKnife('sharp')">Sharp</button>
+    <button id="btn-knife-blunt" class="btn btn-outline" onclick="setKnife('blunt')">Blunt</button>
     <button class="btn btn-primary" id="btn-push"
       onpointerdown="startPush()" onpointerup="stopPush()" onpointerleave="stopPush()">
       Hold to PUSH ↓
@@ -1495,6 +1503,8 @@ const KNIFE_CFG = {
 function setKnife(type){
   knifeType = type;
   if (window.soundFX) window.soundFX.playButtonSound();
+  document.getElementById('btn-knife-sharp').classList.toggle('knife-selected', type==='sharp');
+  document.getElementById('btn-knife-blunt').classList.toggle('knife-selected', type==='blunt');
   document.getElementById('knife-sharp').style.display = type==='sharp' ? '' : 'none';
   document.getElementById('knife-blunt').style.display = type==='blunt' ? '' : 'none';
   document.getElementById('area-label').textContent = 'Area: '+KNIFE_CFG[type].label;

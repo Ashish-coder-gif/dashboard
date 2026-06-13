@@ -126,11 +126,25 @@ h1 .green{color:var(--leaf)}
 .knife-card{
   border:3px solid #EADBC4;background:var(--cream-2);
   border-radius:16px;padding:12px 10px 10px;cursor:pointer;
-  text-align:center;transition:transform .15s, border-color .2s, background .2s;
+  text-align:center;
+  transition:transform .2s ease, border-color .2s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
   font-family:'Nunito',sans-serif;
 }
 .knife-card:hover{transform:translateY(-3px)}
-.knife-card.active{border-color:var(--leaf);background:#EDFBF0;box-shadow:0 6px 0 rgba(88,179,104,.25)}
+.knife-card.active{
+  border-color:var(--tomato-dark);
+  background:linear-gradient(180deg,var(--tomato),var(--tomato-dark));
+  color:#fff;
+  transform:scale(1.03);
+  box-shadow:0 8px 20px rgba(226,57,46,.35);
+  animation:selectedPop .3s ease;
+}
+.knife-card.active .knife-name{color:#fff}
+@keyframes selectedPop{
+  0%{transform:scale(1)}
+  55%{transform:scale(1.08)}
+  100%{transform:scale(1.03)}
+}
 .knife-card svg{width:100%;height:54px;display:block}
 .knife-name{font-family:'Fredoka',sans-serif;font-weight:600;font-size:1rem;margin-top:4px}
 .knife-area{
